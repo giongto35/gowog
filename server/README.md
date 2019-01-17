@@ -9,29 +9,41 @@ Not like webserver when the each requests don't share the state and can have som
 
 Golang provides a very elegant solution to solve high concurrency problem by goroutine and channel while still maintaining good running performance.
 
-# Setup
-
-## 1. Install golang
-
-## 2. Pull this repo and put to src folder
-
-```
-go get github.com/giongto35/gowog -u
-``` 
-
-## 2. Install dependencies:
-
-```
-go get github.com/gorilla/websocket
-go get github.com/golang/protobuf/protoc-gen-go
-go get github.com/pkg/profile
-``` 
-
-Run:
-
-```go run server/cmd/server/*```
+# Installation
+[**Main**](..)
 
 This will run web server in the terminal, which listens to port 8080
+
+# Codebase
+```
+├── server
+│   ├── buildwall.js
+│   ├── cmd
+│   │   └── server
+│   │       └── server.go: Entrypoint running server
+│   ├── game
+│   │   ├── common
+│   │   ├── config
+│   │   │   └── 1.map: Map represented 0 and 1
+│   │   ├── eventmanager
+│   │   ├── gameconst
+│   │   ├── game.go
+│   │   ├── mappkg
+│   │   ├── objmanager
+│   │   ├── playerpkg
+│   │   ├── shape
+│   │   ├── shootpkg
+│   │   ├── types.go
+│   │   └── ws
+│   │       ├── wsclient.go
+│   │       └── wshub.go
+│   ├── generate.sh: Generate protobuf for server + client + AI environment
+│   ├── message.proto
+│   └── Message_proto
+│       └── message.pb.go
+├── Dockerfile
+└── run_local.sh
+```
 
 # Credits
 The server websocket design is based on Gorila websocket chat example
