@@ -2,22 +2,32 @@
 
 ## Summary
 
-Golang based multipler game server. The game can tollerate high concurrency throughput.
+Golang based multipler game server. Following Golang concurrency model, the game can tollerate high concurrency throughput.
 
 # Background
-Not like webserver when the each requests don't share the state and can have some latency acceptance point. Game server involves modifying sharing memory state to achieve smooth performance.
 
+Not like webserver when the each requests don't share the state and can have some latency acceptance point. Game server involves modifying sharing memory state to achieve smooth performance.
 Golang provides a very elegant solution to solve high concurrency problem by goroutine and channel while still maintaining good running performance.
+* Share Memory By Communicating
 
 # Installation
 [**Main**](..)
 
 This will run web server in the terminal, which listens to port 8080
 
-# Codebase
+# Architecture
+## 
+There are mainly 5 entities in the game, which comm
+table
+WSClient
+WSHub
+Game Master
+
+
+## Communication flow
+## Codebase
 ```
 ├── server
-│   ├── buildwall.js
 │   ├── cmd
 │   │   └── server
 │   │       └── server.go: Entrypoint running server
