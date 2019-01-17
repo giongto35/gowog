@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package Message_proto;
+import "google/protobuf/timestamp.proto";
+
+message ClientGameMessage {
+	int32 input_sequence_number = 1;
+	float time_elapsed = 2;
+	oneof message {
+		InitPlayer init_player_payload = 3;
+		MovePosition move_position_payload = 4;
+		Shoot shoot_payload = 5;
+		BuildWall build_wall_payload = 6;
+		UpdatePlayer update_player_payload = 7;
+	}
+}
+
+message Ping {
+	string ping = 1;
+}
+
+enum Direction {
+	UP = 0;
+	DOWN = 1;
+	LEFT = 2;
+	RIGHT = 3;
+}
+
+message MovePosition {
+	int32 id = 1;
+	float dx = 2;
+	float dy = 3;
+}
+
+message InitPlayer {
+	int32 id = 1;
+	int32 client_id = 2; // Client send to server
+	float x = 3;
+	float y = 4;
+	string name = 5;
+	bool is_main = 6;
+}
+
+message Map {
+	repeated int32 block = 1;
+	int32 num_cols = 2;
+	int32 num_rows = 3;
+	float block_width = 4;
+	float block_height = 5;
+}
+
+message InitAll {
+	repeated InitPlayer init_player = 1;
+	Map init_map = 2;
+}
+
+message RemovePlayer {
+	int32 id = 1;
+}
+
+message RegisterClientID {
+	int32 client_id = 1;
+}
+
+message Shoot {
+	enum ShootType {
+		NORMAL = 0;
+	}
+	int64 id = 1;
+	int32 player_id = 2;
+	float x = 3;
+	float y = 4;
+	float dx = 5;
+	float dy = 6;
+	ShootType type = 7;
+}
+
+message BuildWall {
+	int32 id = 1;
+	int32 x = 2;
+	int32 y = 3;
+}
+
+message UpdatePlayer {
+	int32 id = 1;
+	float x = 2;
+	float y = 3;
+	float health = 4;
+	string name = 5;
+	bool is_destroy = 6;
+}
+
+message Player {
+	int32 id = 1;
+	float x = 2;
+	float y = 3;
+	float health = 4;
+	float size = 5;
+	int32 level = 6;
+	int32 score = 7;
+	string name = 8;
+	google.protobuf.Timestamp next_reload = 9;
+	bool is_destroy = 10;
+	int32 current_input_number = 11;
+}
+
+message ServerGameMessage {
+	int32 last_process_input = 1;
+	oneof message {
+		InitAll init_all_payload = 2;
+		InitPlayer init_player_payload = 3;
+		Player update_player_payload = 4;
+		Shoot init_shoot_payload = 5;
+		RemovePlayer remove_player_payload = 6;
+		RegisterClientID register_client_id_payload = 7;
+	}
+}
+
+message WallBlock {
+	float x = 1;
+	float y = 2;
+}
+
+message Bullet {
+	int32 player_id = 1;
+	float sx = 2;
+	float sy = 3;
+	float x = 4;
+	float y = 5;
+	float dx = 6;
+	float dy = 7;
+	float stime = 8;
+}

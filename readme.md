@@ -1,4 +1,4 @@
-# GOWOG, Golang based Web multiplayer Online Game
+# GOWOG, Golang based Multiplayer online game
 
 GOWOG is the open source MMO game written by Golang.  
 On top of that, it opens AI environment for Machine learning enthusiasts to implement AI Bot. The environment can setup to connect to server directly, so we can compete each other on the environment.
