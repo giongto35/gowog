@@ -59,33 +59,35 @@ Package convention is defined in proto file
 
 # FAQ
 
-* Why we need GOlang for multiplayer game?
+### Why we need GOlang for multiplayer game?
 
 Building a massively multiplayer game is very difficult and it's currently overlooked. You have to ensure the latency is acceptable, handle shared states concurrently and allow it to scale vertically. Golang provides a very elegant concept to handle concurrency with goroutine and channel.
 
-* Why the gameplay is so simple and frontend codebase is so unorganized?
+### Why the gameplay is so simple and frontend codebase is so unorganized?
 
 The gameplay is mainly for demonstration purpose. My goal is to keep the game simple as current and scale number of players vertically while maintaining good latency (< 100ms). I welcome all of your ideas to make the game more scalable.
 
 However, I still welcome to have your contribution on making the ui looks better and client codebase cleaner. I would love to see some particles burst or glow, motion effects.
 
-* Why the game only runs on single core?
+### Why the game only runs on single core?
 
 The game indeed can run well on multi-core parallelly. After some comparision, running on multi-core showed the slower performance due to high channel and lock contention.
 
 We need a better design to reduce context switch and contention.
 
-* If the game runs on single core, why needs to you channel? Why don't fully go with NodeJS for server and callback model?
+### If the game runs on single core, why needs to you channel? Why don't fully go with NodeJS for server and callback model?
 
 Remember, concurrency is not parallelism. Context switch can happen everytime. GoRoutine and GoChannel is very elegant solution to deal with concurrency. And it's easier and more intuitive than with Callback model (a.k.a Callback hell).
 
-* Why protobuf?
+### Why protobuf?
 
 To optimize package size, we need to compress it into binary. Protobuf offers fast language-neutral serialization and deserilization, so Golang server can communicate with JS client in an optimal way.
 
 We can consider faster serilization format like Cap'n Proto or FlatBuffers.
 
 # How can I contribute
+
+
 
 ## Client
 ## Server
