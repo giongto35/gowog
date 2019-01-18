@@ -1,7 +1,3 @@
-// Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package ws
 
 import (
@@ -55,6 +51,7 @@ func (c *clientImpl) ReadPump() {
 		fmt.Println("Waiting for message")
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
+			// Client disconnect
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
 			}
@@ -103,10 +100,12 @@ func (c *clientImpl) Send(message []byte) {
 	c.send <- message
 }
 
+// GetSend returns Send channel
 func (c *clientImpl) GetSend() chan []byte {
 	return c.send
 }
 
+// GetID returns client ID
 func (c *clientImpl) GetID() int32 {
 	return c.id
 }

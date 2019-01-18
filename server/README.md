@@ -11,21 +11,30 @@ Golang provides a very elegant solution to solve high concurrency problem by gor
 * Share Memory By Communicating
 
 # Installation
+
 [**Main**](..)
 
 This will run web server in the terminal, which listens to port 8080
 
 # Architecture
-## 
-There are mainly 5 entities in the game, which comm
-table
-WSClient
-WSHub
-Game Master
 
+## Components
+There are mainly 5 entities in the game. Their states are private
+| Entity | Private State | Description |
+| ------ | ----- | ----------- |
+Client | websocket.Conn | client holds websocket connection.
+Hub | Client | Hub handles all communication, containing list of all clients.
+ObjManager | Player, Shoot, ... | ObjManager contains all Player and Shoot, process game logic.
+Game Master | ObjManager, Hub | Master object consists of ObjManager and Hub
 
 ## Communication flow
+
+[FlowDiagram](../flowdiagram.png)
+
+Different entities call each other through channel which is wrapped in a function. Golang prevents cycle package dependency, so if a child want to call parent function, parent needs to expose method to child package. For example,IGame interface in Hub package to allow Hub call Game method.
+
 ## Codebase
+
 ```
 ├── server
 │   ├── cmd
@@ -55,6 +64,14 @@ Game Master
 └── run_local.sh
 ```
 
+## Profile
+
+Profile is the way to investigate Golang performance and figure out the slow components. You can profile the server with flag --cpuprofile, and --memprofile when running server.
+`go run cmd/server --cpuprofile --memprofile`
+
+Loadtest will be added soon.
+
 # Credits
+
 The server websocket design is based on Gorila websocket chat example
 https://github.com/gorilla/websocke/blob/master/examples/chat

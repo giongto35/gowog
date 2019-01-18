@@ -25,6 +25,7 @@ type hubImpl struct {
 	// broadcastMsgStream fetching broadcast message stream event and process it
 	broadcastMsgStream chan broadcastMessage
 
+	// IGame is the interface Game master expose to hub. If Hub want to call game, it needs to call from IGame
 	game IGame
 
 	numClient int32

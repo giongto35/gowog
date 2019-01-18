@@ -14,7 +14,6 @@ import (
 )
 
 type objManager struct {
-	// conn   *websocket.Conn
 	players   map[int32]playerpkg.Player
 	shoots    map[playerpkg.Player][]shootpkg.Shoot
 	gameMap   mappkg.Map

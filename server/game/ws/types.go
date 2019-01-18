@@ -1,5 +1,6 @@
 package ws
 
+// Client is equivalent to a user connection.
 type Client interface {
 	WritePump()
 	ReadPump()
@@ -9,6 +10,7 @@ type Client interface {
 	Close()
 }
 
+// Hub contains all client
 type Hub interface {
 	Run()
 	UnRegister(c Client)
@@ -18,9 +20,9 @@ type Hub interface {
 	BroadcastExclude(b []byte, id int32)
 	BindGameMaster(g IGame)
 	Send(clientID int32, b []byte)
-	//Close(clientID int32)
 }
 
+// IGame is the interface Game master expose to Hub. If Hub want to call Game master, it needs to call from IGame
 type IGame interface {
 	ProcessInput(message []byte)
 	RemovePlayerByClientID(clientID int32)
