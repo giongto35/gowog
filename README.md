@@ -33,7 +33,7 @@ Install dependencies
   * go get github.com/golang/protobuf/protoc-gen-go
   * go get github.com/pkg/profile
 Run the server. The server will listen at port 8080
-  * go run cs2dserver/cmd/server/* 
+  * go run server/cmd/server/* 
  
 #### Client
 
