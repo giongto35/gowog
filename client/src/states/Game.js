@@ -322,7 +322,6 @@ export default class extends Phaser.State {
 
 
     player.destroy();
-    // We nolonger has turret, consider adding it back when we want to have it again
     player.removeChildren(0, player.length);
     player.healthbar.destroy();
     player.nametag.destroy();
@@ -333,7 +332,7 @@ export default class extends Phaser.State {
   registerClientID (registerClientIDMsg) {
     this.clientID = registerClientIDMsg.getClientId();
   }
-
+ 
   initShoot (initShootMsg) {
     var playerID = initShootMsg.getPlayerId();
     var player = this.getPlayerByID(playerID);

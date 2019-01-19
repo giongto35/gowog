@@ -2,24 +2,34 @@
 
 GOWOG is a multiplayer web game written in Golang. The game can serve high number of players concurrently by following Golang concurrency model.
 
-## Try the game
+# Try the game
 
-game.giongto35.com
+## Remote
 
-## Installation
+http://game.giongto35.com
 
-### Docker
+## Local Docker environment
 
-You can try running local environment by running `./run_local.sh`. It will build a docker environment and run the game on "localhost:8080".
-You can continue the development by exec into the docker
+You can try the game on local by running `./run_local.sh`. It will build a docker environment and run the game on "localhost:8080".
+You can continue the development by exec into the docker.
 
-### Manual Installation
+# Development
 
 The game contains two part: Server and Client. Server uses Golang and Client uses Node.JS.
 
-#### Server
+## Script
 
-Install golang ~[golang]https://golang.org/doc/install
+### Linux
+  * ./install_ubuntu.sh
+
+### MACOS
+  * ./install_mac.sh
+
+## Manual Install
+
+### Server
+
+Install Golang https://golang.org/doc/install
 Install dependencies
   * go get github.com/gorilla/websocket
   * go get github.com/golang/protobuf/protoc-gen-go
@@ -27,9 +37,9 @@ Install dependencies
 Run the server. The server will listen at port 8080
   * go run cs2dserver/cmd/server/* 
  
-#### Client
+### Client
 
-Install NodeJS ~[nodejs]https://nodejs.org/en/download/
+Install NodeJS https://nodejs.org/en/download/
   * npm install
   * go get github.com/golang/protobuf/protoc-gen-go
   * go get github.com/pkg/profile
@@ -37,20 +47,16 @@ Run the client. The client will listen at port 3000. env.HOST_IP is the host of 
   * npm run dev -- --env.HOST_IP=localhost:8080
   * open the browser "localhost:3000"
  
-#### Modify package convention
-Install Protobuf gen go for protobuf generate
-  * go get -u github.com/golang/protobuf/protoc-gen-go
+### Communication convention
+
+Communication packages between server and client is based on protobuf. Install protoc for protobuf generate.
   * http://google.github.io/proto-lens/installing-protoc.html
 
-Modify the proto convention and rerun. Run 
-  * ./generate.sh
+Everytime you change package singature in message.proto. Run 
+  * ./server/generate.sh
 
 # Architecture
 ![Techstack](document/images/techstack.jpg)
-
-## Package convention
-
-Package convention is defined in proto file
 
 ## Code structure
 [**Frontend**](client)
@@ -59,7 +65,7 @@ Package convention is defined in proto file
 
 # FAQ
 
-### Why we need GOlang for multiplayer game?
+### Why we need Golang for multiplayer game?
 
 Building a massively multiplayer game is very difficult and it's currently overlooked. You have to ensure the latency is acceptable, handle shared states concurrently and allow it to scale vertically. Golang provides a very elegant concept to handle concurrency with goroutine and channel.
 
@@ -67,7 +73,7 @@ Building a massively multiplayer game is very difficult and it's currently overl
 
 The gameplay is mainly for demonstration purpose. My goal is to keep the game simple as current and scale number of players vertically while maintaining good latency (< 100ms). I welcome all of your ideas to make the game more scalable.
 
-However, I still welcome to have your contribution on making the ui looks better and client codebase cleaner. I would love to see some particles burst or glow, motion effects.
+However, I'm still open to Graphic improvement and client codebase refactor. I would love to see some particles burst or glow, motion effects. Remember that different people have different perspective on how the game should look, so we need full consensus before making ui change.
 
 ### Why the game only runs on single core?
 
@@ -85,14 +91,13 @@ To optimize package size, we need to compress it into binary. Protobuf offers fa
 
 We can consider faster serilization format like Cap'n Proto or FlatBuffers.
 
-# How can I contribute
+### Why the multiplayer game is not room-based (less than 20 players per game)
 
-
-
-## Client
-## Server
+Room-based is less challenging because each room is totally separated from each other and we can scale the game easier by adding more instances. This repo is to illustrate how many players the game can serve on one multi-core single machine.
+And of course my ultimate goal is to make the non room-based game scale vertically by adding more instances.
 
 # Credits
+
 https://github.com/gorilla/websocke/blob/master/examples/chat
 https://github.com/RenaudROHLINGER/phaser-es6-webpack
 https://github.com/huytd/agar.io-clone
@@ -100,4 +105,3 @@ https://github.com/huytd/agar.io-clone
 # Contributor
 
 Nguyen Huu Thanh  
-https://www.linkedin.com/in/huuthanhnguyen/
