@@ -2,6 +2,8 @@
 
 GOWOG is a multiplayer web game written in Golang. The game can serve high number of players concurrently by following Golang concurrency model.
 
+![screenshot](document/images/screenshot.gif)
+
 ## Try the game
 
 http://game.giongto35.com
@@ -15,43 +17,33 @@ You can continue the development by exec into the docker.
 
 The game contains two part: Server and Client. Server uses Golang and Client uses Node.JS.
 
-### Script
-
-#### Linux
-  * ./install_ubuntu.sh
-
-#### MACOS
-  * ./install_mac.sh
-
-### Manual Install
-
 #### Server
 
 Install Golang https://golang.org/doc/install
 Install dependencies
-  * go get github.com/gorilla/websocket
-  * go get github.com/golang/protobuf/protoc-gen-go
-  * go get github.com/pkg/profile
-Run the server. The server will listen at port 8080
-  * go run server/cmd/server/* 
+  * `go get github.com/gorilla/websocket`
+  * `go get github.com/golang/protobuf/protoc-gen-go`
+  * `go get github.com/pkg/profile`
+Run the server. The server will listen at port 8080.
+  * `go run server/cmd/server/*`
  
 #### Client
 
 Install NodeJS https://nodejs.org/en/download/
+Install dependencies
   * npm install
-  * go get github.com/golang/protobuf/protoc-gen-go
-  * go get github.com/pkg/profile
 Run the client. The client will listen at port 3000. env.HOST_IP is the host of server
-  * npm run dev -- --env.HOST_IP=localhost:8080
-  * open the browser "localhost:3000"
+  * `npm run dev -- --env.HOST_IP=localhost:8080`
+Open the browser "localhost:3000"
  
 #### Communication convention
 
 Communication packages between server and client is based on protobuf. Install protoc for protobuf generate.
   * http://google.github.io/proto-lens/installing-protoc.html
 
-Everytime you change package singature in message.proto. Run 
-  * ./server/generate.sh
+Everytime you change package singature in */sertver/message.proto*. Run 
+  * go to `gowog/server`
+  * `/generate.sh`
 
 ## Document
 
