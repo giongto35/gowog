@@ -1,7 +1,5 @@
-# Gowog
-Gowog, Golang based Web multiplayer Online Game
-=======
 # GOWOG, Open source GOlang Web-based Online Game
+=======
 
 GOWOG is a multiplayer web game written in Golang. Thanks to Golang, the server can handle a large number of players concurrently.
 
