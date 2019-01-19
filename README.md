@@ -25,11 +25,13 @@ Install dependencies
   * `go get github.com/golang/protobuf/protoc-gen-go`
   * `go get github.com/pkg/profile`
 Run the server. The server will listen at port 8080.
+Go to *gowog* folder
   * `go run server/cmd/server/*`
  
 #### Client
 
 Install NodeJS https://nodejs.org/en/download/
+Go to *gowog/client* folder
 Install dependencies
   * npm install
 Run the client. The client will listen at port 3000. env.HOST_IP is the host of server
