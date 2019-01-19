@@ -1,6 +1,6 @@
 # GOWOG, Open source GOlang Web-based Online Game
 
-GOWOG is a multiplayer web game written in Golang.
+GOWOG is a multiplayer web game written in Golang. Thanks to Golang, the server can handle a large number of players concurrently.
 
 ![screenshot](document/images/screenshot.gif)
 
