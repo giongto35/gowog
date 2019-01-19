@@ -94,7 +94,7 @@ And of course my ultimate goal is to make the non room-based game scale vertical
 
 ## Contribution guidelines
 
-I'm looking forward to have your contribution to GOWOG, which can help the game smoother and more scalable. If you have any ideas to improve game performance, please discuss in this issue [Discussion]https://github.com/giongto35/gowog/issues/2.
+I'm looking forward to have your contribution to GOWOG, which can help the game smoother and more scalable. If you have any ideas to improve game performance, please discuss in this issue [Discussion](https://github.com/giongto35/gowog/issues/2).
 
 I also welcome frontend improvement like codebase reorganization, performance enhancement. In the case you want to improve the UI, please create an issue to show the new design so we can make an agreement on that.
 
@@ -103,7 +103,9 @@ As my desire is to utilize Golang concurrency paradigm to achieve *smooth gaming
 ## Credits
 
 https://github.com/gorilla/websocke/blob/master/examples/chat
+
 https://github.com/RenaudROHLINGER/phaser-es6-webpack
+
 https://github.com/huytd/agar.io-clone (My inspiration)
 
 ## LICENSE
