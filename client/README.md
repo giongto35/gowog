@@ -3,11 +3,11 @@
 GOWOG front end uses *Phaser* + *ES6* + *Webpack*.
 ![Phaser+ES6+Webpack](https://raw.githubusercontent.com/lean/phaser-es6-webpack/master/assets/images/phaser-es6-webpack.jpg)
 
-# Background
+## Background
 
 GOWOG client is written in Phaser JS. Phaser is a the leading game engine on web platform. In GOWOG, phaser is mainly used for render purpose because game logic should be done on backend.
 
-# Installation
+## Installation
 [**In Main Page**](..)
 
 This will run web game client in the browser. It will also start a watch process, so you can change the source and the process will recompile and refresh the browser automatically.
@@ -16,9 +16,9 @@ Note: localhost:8080 is the address of webserver host.
 
 To see the game, open your browser and enter http://localhost:3000 into the address bar.
 
-# Development
+## Development
 
-## Code structure
+### Code structure
 ```
 ├── client
 │   ├── index.html
@@ -44,7 +44,7 @@ To see the game, open your browser and enter http://localhost:3000 into the addr
 Each object is a class inherited from Sprite.
 Player contain shootManager, each time player fires, a new bullet is generated from shoot manager .
 
-# Credits
+## Credits
 
 The Frontend codebase is based on
 https://github.com/RenaudROHLINGER/phaser-es6-webpack

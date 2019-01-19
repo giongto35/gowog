@@ -2,32 +2,30 @@
 
 GOWOG is a multiplayer web game written in Golang. The game can serve high number of players concurrently by following Golang concurrency model.
 
-# Try the game
-
-## Remote
+## Try the game
 
 http://game.giongto35.com
 
-## Local Docker environment
+### Local
 
 You can try the game on local by running `./run_local.sh`. It will build a docker environment and run the game on "localhost:8080".
 You can continue the development by exec into the docker.
 
-# Development
+## Development
 
 The game contains two part: Server and Client. Server uses Golang and Client uses Node.JS.
 
-## Script
+### Script
 
-### Linux
+#### Linux
   * ./install_ubuntu.sh
 
-### MACOS
+#### MACOS
   * ./install_mac.sh
 
-## Manual Install
+### Manual Install
 
-### Server
+#### Server
 
 Install Golang https://golang.org/doc/install
 Install dependencies
@@ -37,7 +35,7 @@ Install dependencies
 Run the server. The server will listen at port 8080
   * go run cs2dserver/cmd/server/* 
  
-### Client
+#### Client
 
 Install NodeJS https://nodejs.org/en/download/
   * npm install
@@ -47,7 +45,7 @@ Run the client. The client will listen at port 3000. env.HOST_IP is the host of 
   * npm run dev -- --env.HOST_IP=localhost:8080
   * open the browser "localhost:3000"
  
-### Communication convention
+#### Communication convention
 
 Communication packages between server and client is based on protobuf. Install protoc for protobuf generate.
   * http://google.github.io/proto-lens/installing-protoc.html
@@ -55,13 +53,13 @@ Communication packages between server and client is based on protobuf. Install p
 Everytime you change package singature in message.proto. Run 
   * ./server/generate.sh
 
-# Document
+## Document
 
 [**Frontend**](client)
 
 [**Backend**](server)
 
-# FAQ
+## FAQ
 
 ### Why we need Golang for multiplayer game?
 
@@ -94,7 +92,7 @@ We can consider faster serilization format like Cap'n Proto or FlatBuffers.
 In my opinion, room-based is less challenging because each room is totally separated from each other and we can scale the game easier by adding more instances. This repo is to illustrate how many players the game can serve on one multi-core single machine.
 And of course my ultimate goal is to make the non room-based game scale vertically by adding more instances.
 
-# Contribution
+## Contribution guidelines
 
 I'm looking forward to have your contribution to GOWOG, which can help the game smoother and more scalable. If you have any ideas to improve game performance, please discuss in this issue [Discussion]https://github.com/giongto35/gowog/issues/2.
 
@@ -102,17 +100,17 @@ I also welcome frontend improvement like codebase reorganization, performance en
 
 As my desire is to utilize Golang concurrency paradigm to achieve *smooth gaming experience with massive number of players*, I will keep the gameplay simple. Player can move around and shoot each other. Any gameplay changes are not accepted.
 
-# Credits
+## Credits
 
 https://github.com/gorilla/websocke/blob/master/examples/chat
 https://github.com/RenaudROHLINGER/phaser-es6-webpack
 https://github.com/huytd/agar.io-clone (My inspiration)
 
-# LICENSE
+## LICENSE
 
 [MIT License](LICENSE)
 
-# Contributor
+## Contributor
 
 Nguyen Huu Thanh  
 https://www.linkedin.com/in/huuthanhnguyen/
