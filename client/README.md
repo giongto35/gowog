@@ -11,6 +11,7 @@ GOWOG client is written in Phaser JS. Phaser is a the leading game engine on web
 [**In Main Page**](..)
 
 This will run web game client in the browser. It will also start a watch process, so you can change the source and the process will recompile and refresh the browser automatically.
+
 Note: localhost:8080 is the address of webserver host.
   * npm run dev -- --env.HOST_IP=localhost:8080
 

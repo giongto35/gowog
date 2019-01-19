@@ -7,6 +7,7 @@ Golang based multipler game server. Following Golang concurrency model, the game
 ## Background
 
 Not like webserver when the each requests don't share the state and can have some latency acceptance point. Game server involves modifying sharing memory state to achieve smooth performance.
+
 Golang provides a very elegant solution to solve high concurrency problem by goroutine and channel while still maintaining good running performance.
 * Share memory by communication
 
@@ -50,6 +51,7 @@ Client here is webpage, Server is main backend.
 ### Profile
 
 Profile is the way to investigate Golang performance and figure out the slow components. You can profile the server with flag --cpuprofile, and --memprofile when running server.
+
 `go run cmd/server --cpuprofile --memprofile`
 
 Loadtest will be added soon.
