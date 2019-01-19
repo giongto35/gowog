@@ -55,10 +55,8 @@ Communication packages between server and client is based on protobuf. Install p
 Everytime you change package singature in message.proto. Run 
   * ./server/generate.sh
 
-# Architecture
-![Techstack](document/images/techstack.jpg)
+# Document
 
-## Code structure
 [**Frontend**](client)
 
 [**Backend**](server)
@@ -93,15 +91,28 @@ We can consider faster serilization format like Cap'n Proto or FlatBuffers.
 
 ### Why the multiplayer game is not room-based (less than 20 players per game)
 
-Room-based is less challenging because each room is totally separated from each other and we can scale the game easier by adding more instances. This repo is to illustrate how many players the game can serve on one multi-core single machine.
+In my opinion, room-based is less challenging because each room is totally separated from each other and we can scale the game easier by adding more instances. This repo is to illustrate how many players the game can serve on one multi-core single machine.
 And of course my ultimate goal is to make the non room-based game scale vertically by adding more instances.
+
+# Contribution
+
+I'm looking forward to have your contribution to GOWOG, which can help the game smoother and more scalable. If you have any ideas to improve game performance, please discuss in this issue [Discussion]https://github.com/giongto35/gowog/issues/2.
+
+I also welcome frontend improvement like codebase reorganization, performance enhancement. In the case you want to improve the UI, please create an issue to show the new design so we can make an agreement on that.
+
+As my desire is to utilize Golang concurrency paradigm to achieve *smooth gaming experience with massive number of players*, I will keep the gameplay simple. Player can move around and shoot each other. Any gameplay changes are not accepted.
 
 # Credits
 
 https://github.com/gorilla/websocke/blob/master/examples/chat
 https://github.com/RenaudROHLINGER/phaser-es6-webpack
-https://github.com/huytd/agar.io-clone
+https://github.com/huytd/agar.io-clone (My inspiration)
+
+# LICENSE
+
+[MIT License](LICENSE)
 
 # Contributor
 
 Nguyen Huu Thanh  
+https://www.linkedin.com/in/huuthanhnguyen/

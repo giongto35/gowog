@@ -12,14 +12,15 @@ Golang provides a very elegant solution to solve high concurrency problem by gor
 
 # Installation
 
-[**Main**](..)
+[**In Main page**](..)
 
 This will run web server in the terminal, which listens to port 8080
 
-# Architecture
+# Development
 
 ## Components
 There are mainly 5 entities in the game. Their states are private
+
 | Entity | Private State | Description |
 | ------ | ----- | ----------- |
 | Client | websocket.Conn | client holds websocket connection. |
@@ -27,22 +28,24 @@ There are mainly 5 entities in the game. Their states are private
 | ObjManager | Player, Shoot, ... | ObjManager contains all Player and Shoot, process game logic. |
 | Game Master | ObjManager, Hub | Master object consists of ObjManager and Hub. |
 
-## Flow
+## Architecture
 
-[FlowDiagram](../document/images/architecture.png)
+![Architecture](../document/images/architecture.png)
 
 Different entities call each other through channel which is wrapped in a function. Golang prevents cycle package dependency, so if a child want to call parent function, parent needs to expose method to child package. For example,IGame interface in Hub package to allow Hub call Game method.
 
-## Client Server interaction
+## Client Server sample interaction
+
+Client here is webpage, Server is main backend.
 
 ### Player connect
-[PlayerConnect](../document/images/playerconnect.png)
+![PlayerConnect](../document/images/playerconnect.png)
 
 ### Player Disconnect
-[PlayerDisconnect](../document/images/playerdisconnect.png)
+![PlayerDisconnect](../document/images/playerdisconnect.png)
 
 ### Client input
-[ClientInput](../document/images/playeraction.png)
+![ClientInput](../document/images/playeraction.png)
 
 ## Profile
 
@@ -51,7 +54,7 @@ Profile is the way to investigate Golang performance and figure out the slow com
 
 Loadtest will be added soon.
 
-## Codebase
+## Code structure
 
 ```
 ├── server
@@ -62,9 +65,8 @@ Loadtest will be added soon.
 │   │   ├── common
 │   │   ├── config
 │   │   │   └── 1.map: Map represented 0 and 1
-│   │   ├── eventmanager
 │   │   ├── gameconst
-│   │   ├── game.go
+│   │   ├── game.go: Game master objects, containing logic and communication
 │   │   ├── mappkg
 │   │   ├── objmanager
 │   │   ├── playerpkg
