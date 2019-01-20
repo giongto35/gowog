@@ -33,11 +33,3 @@ var playerNameInput = document.getElementById('playerNameInput');
 btn.onclick = function () {
   launchGame();
 };
-
-playerNameInput.addEventListener('keypress', function (e) {
-  var key = e.which || e.keyCode;
-  // Pressing enter => launch game
-  if (key === 13) {
-    launchGame();
-  }
-});

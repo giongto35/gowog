@@ -29,10 +29,10 @@ export default class extends Phaser.Sprite {
     for (var i = 0; i < this.numTop; i++) {
       if (i < topPlayers.length) {
         // topList[i] is a player
-        this.topList[i].text = topPlayers[i].name + '  ' + topPlayers[i].score;
+        this.topList[i].text = topPlayers[i].name + '  ' + topPlayers[i].score + ' kills';
       } else {
         // If i is outside number of current players, fill with empty entry
-        this.topList[i].text = ""
+        this.topList[i].text = '';
       }
     }
   }

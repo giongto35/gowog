@@ -250,8 +250,11 @@ func (m *objManager) IsValidPosition(circleObj shape.Circle) bool {
 func (m *objManager) MovePlayer(player playerpkg.Player, dx float32, dy float32, speed float32, timeElapsed float32) {
 	pdx := dx * timeElapsed * speed
 	pdy := dy * timeElapsed * speed
-	if m.IsValidPosition(player.GetCircle().NextPosition(pdx, pdy)) {
-		player.Move(pdx, pdy)
+	if m.IsValidPosition(player.GetCircle().NextPosition(pdx, 0)) {
+		player.Move(pdx, 0)
+	}
+	if m.IsValidPosition(player.GetCircle().NextPosition(0, pdy)) {
+		player.Move(0, pdy)
 	}
 }
 

@@ -56,9 +56,12 @@ export default class extends Phaser.State {
     this.uiLayer.add(this.leaderboard);
 
     this.cursors = this.game.input.keyboard.createCursorKeys();
-
-    // Add firebutton
-    this.fireButton = this.game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+    this.wasd = {
+      left: this.game.input.keyboard.addKey(Phaser.Keyboard.A),
+      right: this.game.input.keyboard.addKey(Phaser.Keyboard.D),
+      up: this.game.input.keyboard.addKey(Phaser.Keyboard.W),
+      down: this.game.input.keyboard.addKey(Phaser.Keyboard.S)
+    };
 
     this.cntSeqNum = 0;
     this.pending_inputs = [];
@@ -127,16 +130,16 @@ export default class extends Phaser.State {
 
     // Handle input
     // 1 is just to represent the direction
-    if (this.cursors.left.isDown) {
+    if (this.cursors.left.isDown || this.wasd.left.isDown) {
       dx -= 1;
     }
-    if (this.cursors.right.isDown) {
+    if (this.cursors.right.isDown || this.wasd.right.isDown) {
       dx += 1;
     }
-    if (this.cursors.up.isDown) {
+    if (this.cursors.up.isDown || this.wasd.up.isDown) {
       dy -= 1;
     }
-    if (this.cursors.down.isDown) {
+    if (this.cursors.down.isDown || this.wasd.down.isDown) {
       dy += 1;
     }
 
