@@ -8,6 +8,8 @@ GOWOG is a multiplayer web game written in Golang. Thanks to Golang, the server 
 
 http://game.giongto35.com
 
+**Note**: The server host is currently in Singapore, so people in US, Europe might experience high latency. I'm working on hosting to the game on those regions soon. Sorry for the inconvenience.
+
 ### Local
 
 You can try the game on local by running `./run_local.sh`. It will build a docker environment and run the game on port 8080.
