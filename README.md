@@ -7,9 +7,11 @@ GOWOG is a multiplayer web game written in Golang. Thanks to Golang, the server 
 ## Try the game
 
 Southeast Asia region (Vietnam, Singapore, Malaysia ...)
+
 http://game.giongto35.com
 
 US West region (California)
+
 http://us.game.giongto35.com
 
 **Note**: Please select the region closest to you to experience better game experience.
@@ -27,11 +29,15 @@ The game contains two part: Server and Client. Server uses Golang and Client use
 #### Server
 
 Install Golang https://golang.org/doc/install
+
 Install dependencies
+
   * `go get github.com/gorilla/websocket`
   * `go get github.com/golang/protobuf/protoc-gen-go`
   * `go get github.com/pkg/profile`
+
 Run the server. The server will listen at port 8080.
+
 Go to *gowog* folder
   * `go run server/cmd/server/*`
  
@@ -43,7 +49,7 @@ Go to *gowog/client* folder
 
 Install dependencies
 
-  * npm install
+  * `npm install`
 
 Run the client. The client will listen at port 3000. env.HOST_IP is the host of server
 
@@ -120,7 +126,9 @@ As my desire is to utilize Golang concurrency paradigm to achieve *smooth gaming
 ## Credits
 
 https://github.com/gorilla/websocke/blob/master/examples/chat
+
 https://github.com/RenaudROHLINGER/phaser-es6-webpack
+
 https://github.com/huytd/agar.io-clone (My inspiration)
 
 ## LICENSE
