@@ -6,9 +6,13 @@ GOWOG is a multiplayer web game written in Golang. Thanks to Golang, the server 
 
 ## Try the game
 
+Southeast Asia region (Vietnam, Singapore, Malaysia ...)
 http://game.giongto35.com
 
-**Note**: The server host is currently in Singapore, so people in US, Europe might experience high latency. I'm working on hosting to the game on those regions soon. Sorry for the inconvenience.
+US West region (California)
+http://us.game.giongto35.com
+
+**Note**: Please select the region closest to you to experience better game experience.
 
 ### Local
 
@@ -18,7 +22,7 @@ Open the browser "localhost:8080"
 
 ## Development
 
-The game contains two part: Server and Client. Server uses Golang and Client uses Node.JS.
+The game contains two part: Server and Client. Server uses Golang and Client uses Node.JS and Phaser game engine.
 
 #### Server
 

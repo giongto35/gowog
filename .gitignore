@@ -6,3 +6,4 @@ runs
 DockerfileProd
 prod
 run_prod.sh
+build_images_prod.sh
