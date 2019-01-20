@@ -19,7 +19,15 @@ export default class extends Phaser.Sprite {
     graphics.lineStyle(2, 0x000000);
     graphics.beginFill(0x0000FF, 1);
     graphics.drawCircle(0, 0, config.playerSize);
+
+    var texture = game.add.sprite(0, 0, 'vietnam');
+    texture.anchor.setTo(0.5, 0.5);
+    texture.width = config.playerSize;
+    texture.height = config.playerSize;
+    texture.mask = graphics;
+
     this.addChild(graphics);
+    this.addChild(texture);
 
     this.shootManager = new Shoot({
       game: game,
