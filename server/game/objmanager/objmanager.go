@@ -154,6 +154,10 @@ func (m *objManager) Update() {
 					m.eventStream <- common.DestroyPlayerEvent{
 						ID: player.GetID(),
 					}
+					// Add score for player who shoots
+					if player, ok := m.GetPlayerByID(shoot.GetPlayerID()); ok {
+						player.AddScore()
+					}
 				}
 			}
 		}

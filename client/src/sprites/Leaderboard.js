@@ -26,8 +26,14 @@ export default class extends Phaser.Sprite {
   }
 
   updateLeaderboard (topPlayers) {
-    for (var i = 0; i < Math.min(topPlayers.length, this.numTop); i++) {
-      this.topList[i].text = topPlayers[i].name + '  ' + topPlayers[i].score;
+    for (var i = 0; i < this.numTop; i++) {
+      if (i < topPlayers.length) {
+        // topList[i] is a player
+        this.topList[i].text = topPlayers[i].name + '  ' + topPlayers[i].score;
+      } else {
+        // If i is outside number of current players, fill with empty entry
+        this.topList[i].text = ""
+      }
     }
   }
 }

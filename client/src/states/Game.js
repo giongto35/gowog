@@ -255,6 +255,7 @@ export default class extends Phaser.State {
     player.x = playerMsg.getX();
     player.y = playerMsg.getY();
     player.health = playerMsg.getHealth();
+    player.score = playerMsg.getScore();
   }
 
   getPlayerByID (id) {

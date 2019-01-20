@@ -20,6 +20,7 @@ type Player interface {
 	GetNextReload() time.Time
 	SetHealth(health float32)
 	GetHealth() float32
+	AddScore()
 
 	IsEnable() bool
 	SetEnable(enable bool)

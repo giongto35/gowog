@@ -104,6 +104,12 @@ func (p *PlayerImpl) SetHealth(health float32) {
 	p.player.Health = health
 }
 
+// AddScore add score of player by 1. It is called when user killed an enemy
+func (p *PlayerImpl) AddScore() {
+	p.player.Score++
+}
+
+// GetNextReload gets the next allowed shoot time.
 func (p *PlayerImpl) GetNextReload() time.Time {
 	t, _ := ptypes.Timestamp(p.player.GetNextReload())
 	return t
