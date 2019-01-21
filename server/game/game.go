@@ -36,7 +36,7 @@ func NewGame(hub ws.Hub) Game {
 
 	// Setup Object manager
 	g.eventStream = make(chan interface{}, 1000)
-	gameMap := mappkg.NewMap("1", gameconst.BlockWidth, gameconst.BlockHeight)
+	gameMap := mappkg.NewMap(gameconst.BlockWidth, gameconst.BlockHeight)
 	g.objManager = objmanager.NewObjectManager(g.eventStream, gameMap)
 
 	go hub.Run()

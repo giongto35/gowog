@@ -1,12 +1,10 @@
 package mappkg
 
 import (
-	"fmt"
-	"io/ioutil"
-	"path/filepath"
 	"strings"
 
 	"github.com/giongto35/gowog/server/Message_proto"
+	"github.com/giongto35/gowog/server/game/config"
 	"github.com/giongto35/gowog/server/game/shape"
 )
 
@@ -23,34 +21,23 @@ type mapImpl struct {
 	Height      float32
 }
 
-func NewMap(mapName string, blockWidth float32, blockHeight float32) Map {
+// NewMap creates a new map
+func NewMap(blockWidth float32, blockHeight float32) Map {
 	// consider getting blockWidth blockHeight from file map instead of config
 	gameMap := &mapImpl{}
 	gameMap.blockWidth = blockWidth
 	gameMap.blockHeight = blockHeight
 
 	// Load map from a name, the map is a grid of wall
-	gameMap.loadMap(mapName)
+	gameMap.loadMap()
 	return gameMap
 }
 
-func (m *mapImpl) loadMap(mapName string) {
+func (m *mapImpl) loadMap() {
 	// Load map from relative path
-	// TODO: load map from config or CDN
-	mapPath, err := filepath.Abs("server/game/config/" + mapName + ".map")
-	if err != nil {
-		fmt.Println("File not found")
-		return
-	}
+	// This is for opensource simplification, in real production better use some config host
 
-	b, err := ioutil.ReadFile(mapPath) // just pass the file name
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	// Parse the text file
-	// The text file
-	strmap := string(b)
+	strmap := config.RawMap
 	sm := strings.Split(strmap, "\n")
 	m.numRows = len(sm) - 1 // Note -1 because omit the last one
 	m.numCols = len(sm[0])
