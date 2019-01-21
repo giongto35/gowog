@@ -1,3 +1,4 @@
+// package config. To keep the simplification for open source, I will hardcode it.
 package config
 
 var RawMap string = `01100000000000000

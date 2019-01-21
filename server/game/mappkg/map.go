@@ -34,9 +34,6 @@ func NewMap(blockWidth float32, blockHeight float32) Map {
 }
 
 func (m *mapImpl) loadMap() {
-	// Load map from relative path
-	// This is for opensource simplification, in real production better use some config host
-
 	strmap := config.RawMap
 	sm := strings.Split(strmap, "\n")
 	m.numRows = len(sm) - 1 // Note -1 because omit the last one
