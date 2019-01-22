@@ -315,15 +315,17 @@ export default class extends Phaser.State {
   removePlayer (removePlayerMsg) {
     var playerID = removePlayerMsg.getId();
     var player = this.getPlayerByID(playerID);
-    //this.playerList = this.playerList.filter(player => player.id !== playerID);
+    if (player == null) {
+      return;
+    }
+
     for (var i = 0; i < this.playerList.length; i++) {
       if (this.playerList[i].id === playerID) {
         this.playerList.splice(i, 1);
         break;
       }
-      //this.playerList.filter(player => player.id !== playerID);
+      this.playerList.filter(player => player.id !== playerID);
     }
-
 
     player.destroy();
     player.removeChildren(0, player.length);
@@ -331,12 +333,18 @@ export default class extends Phaser.State {
     player.nametag.destroy();
     player.shootManager.destroy();
     this.objectLayer.remove(player);
+
+    if (player === this.player) {
+      // Rejoin
+      alert('You are killed. Press OK to restart the game', this.socket.send(
+        this.createInitPlayerMessage(this.clientID, this.player.name)));
+    }
   }
 
   registerClientID (registerClientIDMsg) {
     this.clientID = registerClientIDMsg.getClientId();
   }
- 
+
   initShoot (initShootMsg) {
     var playerID = initShootMsg.getPlayerId();
     var player = this.getPlayerByID(playerID);
