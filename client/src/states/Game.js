@@ -172,13 +172,23 @@ export default class extends Phaser.State {
 
     // Check bullet hit block
     this.playerList.forEach(player => {
+      // Get all bullets from all player
       player.shootManager.forEachAlive(bullet => {
-        // Bullet hit block
+        // Check if bullet is in Map
         if (!this.isInMap(bullet.position.x, bullet.position.y)) {
           bullet.kill();
         }
+        // Check if bullet hit block
         if (this.isBulletHitBlock(bullet.position.x, bullet.position.y)) {
           bullet.kill();
+        }
+      });
+
+      // Check if bullet hit any other players
+      this.playerList.forEach(enemy => {
+        if (enemy !== player) {
+          // game physics will check collision for all bullets in shootManager (check for the whole list)
+          this.game.physics.arcade.overlap(player.shootManager, enemy, this.bulletHitEnemy, null, this);
         }
       });
     });
