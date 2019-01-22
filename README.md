@@ -24,6 +24,8 @@ Open the browser "localhost:8080"
 
 ## Development
 
+![screenshot](document/images/techstack.jpg)
+
 The game contains two part: Server and Client. Server uses Golang and Client uses Node.JS and Phaser game engine.
 
 #### Server
