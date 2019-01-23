@@ -20,7 +20,7 @@ class Game extends Phaser.Game {
 
 function launchGame () {
   window.game = new Game();
-  document.getElementById('startMenuWrapper').style.maxHeight = '0px';
+  document.getElementById('startMenuWrapper').hidden = true;
   window.game.state.playerName = playerNameInput.value;
   window.game.state.start('Boot');
 }
@@ -33,3 +33,10 @@ var playerNameInput = document.getElementById('playerNameInput');
 btn.onclick = function () {
   launchGame();
 };
+
+playerNameInput.addEventListener('keypress', function (e) {
+  var key = e.which || e.keyCode;
+  if (key === 13) {
+    launchGame();
+  }
+});
