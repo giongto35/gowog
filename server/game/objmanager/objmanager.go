@@ -152,7 +152,8 @@ func (m *objManager) Update() {
 				if player.GetHealth() <= 0 {
 					fmt.Println("Push remove Player Event to event stream")
 					m.eventStream <- common.DestroyPlayerEvent{
-						ID: player.GetID(),
+						PlayerID: player.GetID(),
+						ClientID: -1,
 					}
 					// Add score for player who shoots
 					if player, ok := m.GetPlayerByID(shoot.GetPlayerID()); ok {
@@ -259,24 +260,26 @@ func (m *objManager) MovePlayer(player playerpkg.Player, dx float32, dy float32,
 }
 
 // RemovePlayerByClientID remove player with clientID. We need this because when a client disconnected, hub notified objManager with clientID
-func (m *objManager) RemovePlayerByClientID(clientID int32) {
-	var playerID int32
+// We don't delete player here because this function is called from game master
+//func (m *objManager) RemovePlayerByClientID(clientID int32) {
+//// Send destroy event to game master
+//m.eventStream <- common.DestroyPlayerEvent{
+//ClientID: clientID,
+//PlayerID: -1,
+//}
+//}
 
-	// Fetch the playerID out instead of sending destroy event immediately to avoid deadlock
+// RemovePlayer remove player according to player ID or ClientID. This call need to be concurrently safe (by put behind event stream).
+func (m *objManager) RemovePlayer(playerID int32, clientID int32) {
+	// Remove by PlayerID
+	if playerID != -1 {
+		delete(m.players, playerID)
+	}
+	// Remove by ClientID
 	for _, player := range m.players {
 		if player.GetClientID() == clientID {
-			playerID = player.GetID()
+			delete(m.players, player.GetID())
+			return
 		}
 	}
-
-	// Send destroy event to game master
-	m.eventStream <- common.DestroyPlayerEvent{
-		ID: playerID,
-	}
-}
-
-// RemovePlayerByID remove player according to player ID. This is actively called by objManager when a player is removed by objManager. E.g out of health
-func (m *objManager) RemovePlayerByID(id int32) {
-	// Remove from m.shoots
-	delete(m.players, id)
 }

@@ -48,11 +48,11 @@ type registerClientEvent struct {
 
 func NewHub() Hub {
 	return &hubImpl{
-		msgStream:          make(chan []byte, 100),
-		singleMsgStream:    make(chan singleMessage, 100),
-		broadcastMsgStream: make(chan broadcastMessage, 100),
+		msgStream:          make(chan []byte, 500),
+		singleMsgStream:    make(chan singleMessage, 500),
+		broadcastMsgStream: make(chan broadcastMessage, 500),
 		register:           make(chan registerClientEvent),
-		unregister:         make(chan Client, 100),
+		unregister:         make(chan Client, 500),
 		clients:            make(map[int32]Client),
 	}
 }
@@ -75,7 +75,6 @@ func (h *hubImpl) Run() {
 			// send to game event stream
 			delete(h.clients, client.GetID())
 			client.Close()
-			//client.Close()
 
 		case message := <-h.msgStream:
 			h.game.ProcessInput(message)

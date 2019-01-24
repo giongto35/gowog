@@ -11,8 +11,7 @@ import (
 type ObjectManager interface {
 	RegisterPlayer(clientID int32, name string) playerpkg.Player
 	RegisterShoot(player playerpkg.Player, x float32, y float32, dx float32, dy float32, startTime time.Time) shootpkg.Shoot
-	RemovePlayerByID(id int32)
-	RemovePlayerByClientID(id int32)
+	RemovePlayer(id int32, clientID int32)
 
 	//RangePlayers(f func(player playerpkg.Player))
 	GetPlayers() []playerpkg.Player

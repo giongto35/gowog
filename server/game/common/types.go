@@ -2,7 +2,8 @@ package common
 
 // DestroyPlayerEvent is event sent from objManager to game master
 type DestroyPlayerEvent struct {
-	ID int32
+	ClientID int32
+	PlayerID int32
 }
 
 // NewPlayerEvent is event sent from objManager to game master

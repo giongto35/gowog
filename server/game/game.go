@@ -35,7 +35,7 @@ func NewGame(hub ws.Hub) Game {
 	g.hub = hub
 
 	// Setup Object manager
-	g.eventStream = make(chan interface{}, 1000)
+	g.eventStream = make(chan interface{}, 500)
 	gameMap := mappkg.NewMap(gameconst.BlockWidth, gameconst.BlockHeight)
 	g.objManager = objmanager.NewObjectManager(g.eventStream, gameMap)
 
@@ -58,7 +58,7 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 				switch v := e.(type) {
 				case common.DestroyPlayerEvent:
 					fmt.Println("Remove player", v)
-					g.removePlayer(v.ID)
+					g.removePlayer(v.PlayerID, v.ClientID)
 
 				case common.NewPlayerEvent:
 					fmt.Println("New player with clientID", v)
@@ -268,8 +268,8 @@ func (g *gameImpl) initPlayer(clientID int32, name string) {
 //  This is game logic which
 //    + Remove player from playerList
 //    + Broadcast remove event to other
-func (g *gameImpl) removePlayer(playerID int32) {
-	g.objManager.RemovePlayerByID(playerID)
+func (g *gameImpl) removePlayer(playerID int32, clientID int32) {
+	g.objManager.RemovePlayer(playerID, clientID)
 
 	// Send remove player event to all players
 	removePlayerMsg := &Message_proto.ServerGameMessage{
@@ -287,5 +287,8 @@ func (g *gameImpl) removePlayer(playerID int32) {
 // RemovePlayerByClientID remove player from game using Client ID
 // It only touch gamelogic, not the clients
 func (g *gameImpl) RemovePlayerByClientID(clientID int32) {
-	g.objManager.RemovePlayerByClientID(clientID)
+	g.eventStream <- common.DestroyPlayerEvent{
+		ClientID: clientID,
+		PlayerID: -1,
+	}
 }
