@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -43,12 +42,12 @@ type clientImpl struct {
 // reads from this goroutine.
 func (c *clientImpl) ReadPump() {
 	defer func() {
-		fmt.Println("Close readpump")
+		log.Println("Close readpump")
 		c.hub.UnRegister(c)
 		c.conn.Close()
 	}()
 	for {
-		fmt.Println("Waiting for message")
+		log.Println("Waiting for message")
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			// Client disconnect

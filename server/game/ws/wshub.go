@@ -1,8 +1,6 @@
 package ws
 
-import (
-	"fmt"
-)
+import "log"
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
@@ -62,7 +60,7 @@ func (h *hubImpl) BindGameMaster(game IGame) {
 }
 
 func (h *hubImpl) Run() {
-	fmt.Println("Hub is running")
+	log.Println("Hub is running")
 	for {
 		select {
 		case register := <-h.register:
@@ -81,19 +79,19 @@ func (h *hubImpl) Run() {
 
 		case serverMessage := <-h.broadcastMsgStream:
 			// Broadcast message exclude serverMessage.clientID
-			fmt.Println("Broadcast message ")
+			log.Println("Broadcast message ")
 			excludeID := serverMessage.excludeID
 			for id, client := range h.clients {
 				if id == excludeID {
 					continue
 				}
-				fmt.Println("   to ", id)
+				log.Println("   to ", id)
 				client.GetSend() <- serverMessage.msg
 			}
 
 		case serverMessage := <-h.singleMsgStream:
 			// Sending single message exclude serverMessage.clientID
-			fmt.Println("Sending single message to ", serverMessage.clientID)
+			log.Println("Sending single message to ", serverMessage.clientID)
 			if client, ok := h.clients[serverMessage.clientID]; ok {
 				client.GetSend() <- serverMessage.msg
 			}

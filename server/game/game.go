@@ -4,7 +4,6 @@ package game
 // For each event it received, it will do game logic and sending message to other.
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"runtime"
@@ -58,15 +57,15 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 			case e := <-g.eventStream:
 				switch v := e.(type) {
 				case common.DestroyPlayerEvent:
-					fmt.Println("Remove player", v)
+					log.Println("Remove player", v)
 					g.removePlayer(v.PlayerID, v.ClientID)
 
 				case common.NewPlayerEvent:
-					fmt.Println("New player with clientID", v)
+					log.Println("New player with clientID", v)
 					g.newPlayerConnect(v.ClientID)
 
 				case common.ProcessInputEvent:
-					fmt.Println("Processs Message", v)
+					log.Println("Processs Message", v)
 					g.processInput(v.Message)
 				}
 
@@ -87,14 +86,14 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 
 // Update update all objects in each server ticks
 func (g *gameImpl) Update() {
-	fmt.Printf("#goroutines: %d\n", runtime.NumGoroutine())
+	log.Printf("#goroutines: %d\n", runtime.NumGoroutine())
 
 	// Update all object logic
 	g.objManager.Update()
 
 	// Send to all clients the updated environment
 	for _, player := range g.objManager.GetPlayers() {
-		fmt.Println("Update Player ", player.GetPlayerProto())
+		log.Println("Update Player ", player.GetPlayerProto())
 		updatePlayerMsg := &Message_proto.ServerGameMessage{
 			Message: &Message_proto.ServerGameMessage_UpdatePlayerPayload{
 				UpdatePlayerPayload: player.GetPlayerProto(),
@@ -138,7 +137,7 @@ func (g *gameImpl) processInput(message []byte) {
 	// Process different type of message received from client
 	switch msg.Message.(type) {
 	case *Message_proto.ClientGameMessage_MovePositionPayload:
-		fmt.Println("Received Move Message", msg)
+		log.Println("Received Move Message", msg)
 		// Move player game logic
 		player, ok := g.objManager.GetPlayerByID(msg.GetMovePositionPayload().GetId())
 		if !ok {
@@ -150,7 +149,7 @@ func (g *gameImpl) processInput(message []byte) {
 		player.SetCurrentInputNumber(msg.InputSequenceNumber)
 
 	case *Message_proto.ClientGameMessage_ShootPayload:
-		fmt.Println("Received Shoot Message", msg.GetShootPayload())
+		log.Println("Received Shoot Message", msg.GetShootPayload())
 		player, ok := g.objManager.GetPlayerByID(msg.GetShootPayload().GetPlayerId())
 		if !ok {
 			break
@@ -163,7 +162,7 @@ func (g *gameImpl) processInput(message []byte) {
 		g.sendShootMsg(shoot)
 
 	case *Message_proto.ClientGameMessage_InitPlayerPayload:
-		fmt.Println("Received Init Player Message", msg.GetInitPlayerPayload())
+		log.Println("Received Init Player Message", msg.GetInitPlayerPayload())
 		g.initPlayer(msg.GetInitPlayerPayload().GetClientId(), msg.GetInitPlayerPayload().GetName())
 	}
 }
@@ -281,7 +280,7 @@ func (g *gameImpl) removePlayer(playerID int32, clientID int32) {
 		},
 	}
 	encodedMsg, _ := proto.Marshal(removePlayerMsg)
-	fmt.Println("Send Remove Player Message ", removePlayerMsg)
+	log.Println("Send Remove Player Message ", removePlayerMsg)
 	g.hub.Broadcast(encodedMsg)
 }
 
