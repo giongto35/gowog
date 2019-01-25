@@ -269,17 +269,19 @@ func (m *objManager) MovePlayer(player playerpkg.Player, dx float32, dy float32,
 //}
 //}
 
-// RemovePlayer remove player according to player ID or ClientID. This call need to be concurrently safe (by put behind event stream).
-func (m *objManager) RemovePlayer(playerID int32, clientID int32) {
+// RemovePlayer remove player according to player ID or ClientID, return playerID. This call need to be concurrently safe (by put behind event stream).
+func (m *objManager) RemovePlayer(playerID int32, clientID int32) (removePlayerID int32) {
 	// Remove by PlayerID
 	if playerID != -1 {
 		delete(m.players, playerID)
+		return playerID
 	}
 	// Remove by ClientID
 	for _, player := range m.players {
 		if player.GetClientID() == clientID {
 			delete(m.players, player.GetID())
-			return
+			return player.GetID()
 		}
 	}
+	return -1
 }

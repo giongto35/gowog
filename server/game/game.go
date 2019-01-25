@@ -269,13 +269,13 @@ func (g *gameImpl) initPlayer(clientID int32, name string) {
 //    + Remove player from playerList
 //    + Broadcast remove event to other
 func (g *gameImpl) removePlayer(playerID int32, clientID int32) {
-	g.objManager.RemovePlayer(playerID, clientID)
+	rplayerID := g.objManager.RemovePlayer(playerID, clientID)
 
 	// Send remove player event to all players
 	removePlayerMsg := &Message_proto.ServerGameMessage{
 		Message: &Message_proto.ServerGameMessage_RemovePlayerPayload{
 			RemovePlayerPayload: &Message_proto.RemovePlayer{
-				Id: playerID,
+				Id: rplayerID,
 			},
 		},
 	}
