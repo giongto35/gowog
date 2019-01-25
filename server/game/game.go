@@ -27,6 +27,7 @@ type gameImpl struct {
 	hub         ws.Hub
 	eventStream chan interface{}
 	objManager  objmanager.ObjectManager
+	quitChannel chan bool
 }
 
 // NewGame create new game master
@@ -40,7 +41,7 @@ func NewGame(hub ws.Hub) Game {
 	g.objManager = objmanager.NewObjectManager(g.eventStream, gameMap)
 
 	go hub.Run()
-	g.gameUpdate()
+	g.quitChannel = g.gameUpdate()
 	hub.BindGameMaster(&g)
 	return &g
 }
@@ -291,4 +292,9 @@ func (g *gameImpl) RemovePlayerByClientID(clientID int32) {
 		ClientID: clientID,
 		PlayerID: -1,
 	}
+}
+
+// GetQuitChannel returns Quit channel for the outside
+func (g *gameImpl) GetQuitChannel() chan bool {
+	return g.quitChannel
 }
