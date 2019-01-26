@@ -52,7 +52,6 @@ func (c *clientImpl) ReadPump() {
 		log.Println("Waiting for message")
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
-			fmt.Println("ERROR ", err)
 			// Client disconnect
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)

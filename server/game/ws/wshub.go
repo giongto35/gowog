@@ -74,8 +74,6 @@ func (h *hubImpl) Run() {
 			delete(h.clients, client.GetID())
 			client.Close()
 
-		//case message := <-h.msgStream:
-
 		case serverMessage := <-h.broadcastMsgStream:
 			// Broadcast message exclude serverMessage.clientID
 			log.Println("Broadcast message ")
