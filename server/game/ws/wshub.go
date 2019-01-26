@@ -106,6 +106,7 @@ func (h *hubImpl) UnRegister(c Client) {
 }
 
 func (h *hubImpl) ReceiveMessage(message []byte) {
+	// Not send to hub channel because this call go directly to game
 	h.game.ProcessInput(message)
 }
 
