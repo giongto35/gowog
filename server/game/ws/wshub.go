@@ -1,6 +1,9 @@
 package ws
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
@@ -25,8 +28,6 @@ type hubImpl struct {
 
 	// IGame is the interface Game master expose to hub. If Hub want to call game, it needs to call from IGame
 	game IGame
-
-	numClient int32
 }
 
 type singleMessage struct {
@@ -40,8 +41,7 @@ type broadcastMessage struct {
 }
 
 type registerClientEvent struct {
-	clientIDChan chan int32
-	client       Client
+	client Client
 }
 
 func NewHub() Hub {
@@ -50,7 +50,7 @@ func NewHub() Hub {
 		singleMsgStream:    make(chan singleMessage, 500),
 		broadcastMsgStream: make(chan broadcastMessage, 500),
 		register:           make(chan registerClientEvent),
-		unregister:         make(chan Client, 500),
+		unregister:         make(chan Client),
 		clients:            make(map[int32]Client),
 	}
 }
@@ -64,18 +64,15 @@ func (h *hubImpl) Run() {
 	for {
 		select {
 		case register := <-h.register:
-			h.numClient++
-			h.clients[h.numClient-1] = register.client
-			register.clientIDChan <- h.numClient - 1
+			client := register.client
+			fmt.Println("REgisterd", client)
+			h.clients[client.GetID()] = client
 
 		case client := <-h.unregister:
 			h.game.RemovePlayerByClientID(client.GetID())
 			// send to game event stream
 			delete(h.clients, client.GetID())
 			client.Close()
-
-		case message := <-h.msgStream:
-			h.game.ProcessInput(message)
 
 		case serverMessage := <-h.broadcastMsgStream:
 			// Broadcast message exclude serverMessage.clientID
@@ -99,20 +96,17 @@ func (h *hubImpl) Run() {
 	}
 }
 
-func (h *hubImpl) Register(c Client) <-chan int32 {
+func (h *hubImpl) Register(c Client) {
 	// This clientIDchan is the channel for client to receive clientID after initilized
-	clientIDChan := make(chan int32)
-	h.register <- registerClientEvent{client: c, clientIDChan: clientIDChan}
-
-	return clientIDChan
+	h.register <- registerClientEvent{client: c}
 }
 
 func (h *hubImpl) UnRegister(c Client) {
 	h.unregister <- c
 }
 
-func (h *hubImpl) ReceiveMessage(b []byte) {
-	h.msgStream <- b
+func (h *hubImpl) ReceiveMessage(message []byte) {
+	h.game.ProcessInput(message)
 }
 
 func (h *hubImpl) Send(clientID int32, b []byte) {

@@ -1,7 +1,9 @@
 package ws
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -73,18 +75,21 @@ func (c *clientImpl) WritePump() {
 			if !ok {
 				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
-				return
+				fmt.Println("Write pump closed")
+				break
 			}
 
 			w, err := c.conn.NextWriter(websocket.BinaryMessage)
 			if err != nil {
-				return
+				fmt.Println("Write pump closed", err)
+				break
 			}
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
 			if err := w.Close(); err != nil {
-				return
+				fmt.Println("Write pump closed", err)
+				break
 			}
 		}
 	}
@@ -116,10 +121,11 @@ func NewClient(upgrader websocket.Upgrader, hub Hub, w http.ResponseWriter, r *h
 		log.Println(err)
 		return -1
 	}
-	client := &clientImpl{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	// TODO: disconnect and reconnect cause deadlock
+	client := &clientImpl{id: rand.Int31(), hub: hub, conn: conn, send: make(chan []byte)}
 	// We need to register client from hub.
-	clientIDChan := client.hub.Register(client)
-	client.id = <-clientIDChan
+	client.hub.Register(client)
+	//client.id = <-clientIDChan
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
