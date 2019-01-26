@@ -23,7 +23,7 @@ func initGame() *gameImpl {
 	g.hub = hub
 
 	// Setup Object manager
-	g.eventStream = make(chan interface{}, 500)
+	g.eventStream = make(chan interface{})
 	gameMap := mappkg.NewMap(gameconst.BlockWidth, gameconst.BlockHeight)
 	g.objManager = objmanager.NewObjectManager(g.eventStream, gameMap)
 

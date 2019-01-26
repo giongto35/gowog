@@ -5,7 +5,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/giongto35/gowog/server/game/common"
 	"github.com/giongto35/gowog/server/game/gameconst"
 	"github.com/giongto35/gowog/server/game/mappkg"
 	"github.com/giongto35/gowog/server/game/playerpkg"
@@ -151,10 +150,11 @@ func (m *objManager) Update() {
 				// Remove player if health is under 0
 				if player.GetHealth() <= 0 {
 					log.Println("Push remove Player Event to event stream")
-					m.eventStream <- common.DestroyPlayerEvent{
-						PlayerID: player.GetID(),
-						ClientID: -1,
-					}
+					// TODO: Removeplayer here, don't need send
+					//m.eventStream <- common.DestroyPlayerEvent{
+					//PlayerID: player.GetID(),
+					//ClientID: -1,
+					//}
 					// Add score for player who shoots
 					if player, ok := m.GetPlayerByID(shoot.GetPlayerID()); ok {
 						player.AddScore()
