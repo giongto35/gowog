@@ -50,7 +50,7 @@ func NewHub() Hub {
 		singleMsgStream:    make(chan singleMessage, 500),
 		broadcastMsgStream: make(chan broadcastMessage, 500),
 		register:           make(chan registerClientEvent),
-		unregister:         make(chan Client, 500),
+		unregister:         make(chan Client),
 		clients:            make(map[int32]Client),
 	}
 }

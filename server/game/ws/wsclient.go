@@ -116,7 +116,8 @@ func NewClient(upgrader websocket.Upgrader, hub Hub, w http.ResponseWriter, r *h
 		log.Println(err)
 		return -1
 	}
-	client := &clientImpl{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	// TODO: disconnect and reconnect cause deadlock
+	client := &clientImpl{hub: hub, conn: conn, send: make(chan []byte)}
 	// We need to register client from hub.
 	clientIDChan := client.hub.Register(client)
 	client.id = <-clientIDChan
