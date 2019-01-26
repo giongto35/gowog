@@ -2,6 +2,7 @@ package ws
 
 import (
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -117,10 +118,10 @@ func NewClient(upgrader websocket.Upgrader, hub Hub, w http.ResponseWriter, r *h
 		return -1
 	}
 	// TODO: disconnect and reconnect cause deadlock
-	client := &clientImpl{hub: hub, conn: conn, send: make(chan []byte)}
+	client := &clientImpl{id: rand.Int31(), hub: hub, conn: conn, send: make(chan []byte)}
 	// We need to register client from hub.
-	clientIDChan := client.hub.Register(client)
-	client.id = <-clientIDChan
+	client.hub.Register(client)
+	//client.id = <-clientIDChan
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.

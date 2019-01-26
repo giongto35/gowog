@@ -14,7 +14,7 @@ type Client interface {
 type Hub interface {
 	Run()
 	UnRegister(c Client)
-	Register(c Client) <-chan int32
+	Register(c Client)
 	ReceiveMessage(b []byte)
 	Broadcast(b []byte)
 	BroadcastExclude(b []byte, id int32)

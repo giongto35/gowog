@@ -1,6 +1,9 @@
 package ws
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
@@ -25,8 +28,6 @@ type hubImpl struct {
 
 	// IGame is the interface Game master expose to hub. If Hub want to call game, it needs to call from IGame
 	game IGame
-
-	numClient int32
 }
 
 type singleMessage struct {
@@ -40,8 +41,7 @@ type broadcastMessage struct {
 }
 
 type registerClientEvent struct {
-	clientIDChan chan int32
-	client       Client
+	client Client
 }
 
 func NewHub() Hub {
@@ -64,9 +64,9 @@ func (h *hubImpl) Run() {
 	for {
 		select {
 		case register := <-h.register:
-			h.numClient++
-			h.clients[h.numClient-1] = register.client
-			register.clientIDChan <- h.numClient - 1
+			client := register.client
+			fmt.Println("REgisterd", client)
+			h.clients[client.GetID()] = client
 
 		case client := <-h.unregister:
 			h.game.RemovePlayerByClientID(client.GetID())
@@ -99,12 +99,9 @@ func (h *hubImpl) Run() {
 	}
 }
 
-func (h *hubImpl) Register(c Client) <-chan int32 {
+func (h *hubImpl) Register(c Client) {
 	// This clientIDchan is the channel for client to receive clientID after initilized
-	clientIDChan := make(chan int32)
-	h.register <- registerClientEvent{client: c, clientIDChan: clientIDChan}
-
-	return clientIDChan
+	h.register <- registerClientEvent{client: c}
 }
 
 func (h *hubImpl) UnRegister(c Client) {
