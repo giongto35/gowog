@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -51,6 +52,7 @@ func (c *clientImpl) ReadPump() {
 		log.Println("Waiting for message")
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
+			fmt.Println("ERROR ", err)
 			// Client disconnect
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Printf("error: %v", err)
@@ -74,18 +76,21 @@ func (c *clientImpl) WritePump() {
 			if !ok {
 				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
-				return
+				fmt.Println("Write pump closed")
+				break
 			}
 
 			w, err := c.conn.NextWriter(websocket.BinaryMessage)
 			if err != nil {
-				return
+				fmt.Println("Write pump closed", err)
+				break
 			}
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
 			if err := w.Close(); err != nil {
-				return
+				fmt.Println("Write pump closed", err)
+				break
 			}
 		}
 	}

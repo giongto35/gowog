@@ -74,8 +74,7 @@ func (h *hubImpl) Run() {
 			delete(h.clients, client.GetID())
 			client.Close()
 
-		case message := <-h.msgStream:
-			h.game.ProcessInput(message)
+		//case message := <-h.msgStream:
 
 		case serverMessage := <-h.broadcastMsgStream:
 			// Broadcast message exclude serverMessage.clientID
@@ -108,8 +107,8 @@ func (h *hubImpl) UnRegister(c Client) {
 	h.unregister <- c
 }
 
-func (h *hubImpl) ReceiveMessage(b []byte) {
-	h.msgStream <- b
+func (h *hubImpl) ReceiveMessage(message []byte) {
+	h.game.ProcessInput(message)
 }
 
 func (h *hubImpl) Send(clientID int32, b []byte) {
