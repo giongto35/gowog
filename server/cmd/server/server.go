@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"runtime"
@@ -16,6 +17,7 @@ import (
 var addr = flag.String("addr", "0.0.0.0:8080", "http service address")
 var cpuprofile = flag.Bool("cpuprofile", false, "Enable CPUProfile")
 var memprofile = flag.Bool("memprofile", false, "Enable MemProfile")
+var disablelog = flag.Bool("disablelog", false, "Disable log")
 var clientBuild = flag.String("prod", "", "is production")
 
 var upgrader = websocket.Upgrader{} // use default options
@@ -30,8 +32,11 @@ func connect(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// Running on one core only
-	runtime.GOMAXPROCS(1)
+	runtime.GOMAXPROCS(3)
 	flag.Parse()
+	if *disablelog {
+		log.SetOutput(ioutil.Discard)
+	}
 	// CPU profile
 	if *cpuprofile {
 		fmt.Println("Profiling CPU")
