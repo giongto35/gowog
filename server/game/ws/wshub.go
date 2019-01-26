@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"fmt"
 	"log"
 )
 
@@ -10,9 +9,6 @@ import (
 type hubImpl struct {
 	// Registered clients.
 	clients map[int32]Client
-
-	// msgStream fetching messages from the clients.
-	msgStream chan []byte
 
 	// register fetching register event and process it
 	register chan registerClientEvent
@@ -46,7 +42,6 @@ type registerClientEvent struct {
 
 func NewHub() Hub {
 	return &hubImpl{
-		msgStream:          make(chan []byte, 500),
 		singleMsgStream:    make(chan singleMessage, 500),
 		broadcastMsgStream: make(chan broadcastMessage, 500),
 		register:           make(chan registerClientEvent),
@@ -65,7 +60,6 @@ func (h *hubImpl) Run() {
 		select {
 		case register := <-h.register:
 			client := register.client
-			fmt.Println("REgisterd", client)
 			h.clients[client.GetID()] = client
 
 		case client := <-h.unregister:
