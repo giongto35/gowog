@@ -20,3 +20,7 @@ type ObjectManager interface {
 
 	Update()
 }
+
+type IGame interface {
+	RemovePlayer(playerID int32, clientID int32)
+}

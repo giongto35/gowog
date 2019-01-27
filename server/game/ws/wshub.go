@@ -71,7 +71,7 @@ func (h *hubImpl) Run() {
 		case client := <-h.unregister:
 			// TODO: BUG HERE, deadlock
 			log.Println("Close client ", client.GetID())
-			h.game.RemovePlayerByClientID(client.GetID())
+			//h.game.RemovePlayerByClientID(client.GetID())
 			log.Println("Close client done", client.GetID())
 			// send to game event stream
 			delete(h.clients, client.GetID())

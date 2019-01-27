@@ -42,7 +42,7 @@ func NewGame(hub ws.Hub) Game {
 	g.newPlayerStream = make(chan common.NewPlayerEvent, gameconst.BufferSize)
 	g.inputStream = make(chan common.ProcessInputEvent, gameconst.BufferSize)
 	gameMap := mappkg.NewMap(gameconst.BlockWidth, gameconst.BlockHeight)
-	g.objManager = objmanager.NewObjectManager(g.destroyPlayerStream, gameMap)
+	g.objManager = objmanager.NewObjectManager(&g, g.destroyPlayerStream, gameMap)
 
 	go hub.Run()
 	g.quitChannel = g.gameUpdate()
@@ -300,6 +300,15 @@ func (g *gameImpl) removePlayer(playerID int32, clientID int32) {
 	encodedMsg, _ := proto.Marshal(removePlayerMsg)
 	log.Println("Send Remove Player Message ", removePlayerMsg)
 	g.hub.Broadcast(encodedMsg)
+	log.Println("Send Remove Player Message Done")
+}
+
+//  removePlayer remove player logic from game using player ID
+//  This is game logic which
+//    + Remove player from playerList
+//    + Broadcast remove event to other
+func (g *gameImpl) RemovePlayer(playerID int32, clientID int32) {
+	g.removePlayer(playerID, clientID)
 }
 
 // RemovePlayerByClientID remove player from game using Client ID
