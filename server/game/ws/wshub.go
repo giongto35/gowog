@@ -3,6 +3,8 @@ package ws
 import (
 	"fmt"
 	"log"
+
+	"github.com/giongto35/gowog/server/game/gameconst"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -43,10 +45,10 @@ type registerClientEvent struct {
 
 func NewHub() Hub {
 	return &hubImpl{
-		singleMsgStream:    make(chan singleMessage, 1),
-		broadcastMsgStream: make(chan broadcastMessage, 1),
-		register:           make(chan registerClientEvent),
-		unregister:         make(chan Client),
+		singleMsgStream:    make(chan singleMessage, gameconst.BufferSize),
+		broadcastMsgStream: make(chan broadcastMessage, gameconst.BufferSize),
+		register:           make(chan registerClientEvent, gameconst.BufferSize),
+		unregister:         make(chan Client, gameconst.BufferSize),
 		clients:            make(map[int32]Client),
 	}
 }
@@ -58,22 +60,26 @@ func (h *hubImpl) BindGameMaster(game IGame) {
 func (h *hubImpl) Run() {
 	log.Println("Hub is running")
 	for {
+		log.Println("HUB PROCESS")
 		select {
 		case register := <-h.register:
+			log.Println("HUB register", register.client.GetID())
 			client := register.client
 			h.clients[client.GetID()] = client
+			log.Println("HUB register done")
 
 		case client := <-h.unregister:
 			// TODO: BUG HERE, deadlock
-			//h.game.RemovePlayerByClientID(client.GetID())
+			log.Println("Close client ", client.GetID())
+			h.game.RemovePlayerByClientID(client.GetID())
+			log.Println("Close client done", client.GetID())
 			// send to game event stream
 			delete(h.clients, client.GetID())
-			fmt.Println("Close client ", client.GetID())
 			client.Close()
 
 		case serverMessage := <-h.broadcastMsgStream:
 			// Broadcast message exclude serverMessage.clientID
-			log.Println("Broadcast message ")
+			log.Println("Hub Broadcast message ")
 			excludeID := serverMessage.excludeID
 			for id, client := range h.clients {
 				if id == excludeID {
@@ -88,6 +94,7 @@ func (h *hubImpl) Run() {
 					//client.Close()
 				}
 			}
+			log.Println("Hub Broadcast message done")
 
 		case serverMessage := <-h.singleMsgStream:
 			// Sending single message exclude serverMessage.clientID
@@ -100,7 +107,9 @@ func (h *hubImpl) Run() {
 					//log.Println("Sended to close channel", client)
 				}
 			}
+			log.Println("Sending single message to ", serverMessage.clientID, " done")
 		}
+		log.Println("HUB DONE")
 	}
 }
 
@@ -132,5 +141,7 @@ func (h *hubImpl) BroadcastExclude(b []byte, excludeID int32) {
 }
 
 func (h *hubImpl) broadcast(b []byte, excludeID int32) {
+	log.Println("Hub broadcasting message ", len(h.broadcastMsgStream))
 	h.broadcastMsgStream <- broadcastMessage{excludeID: excludeID, msg: b}
+	log.Println("Hub broadcasting done")
 }

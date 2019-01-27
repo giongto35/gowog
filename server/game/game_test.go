@@ -17,15 +17,18 @@ import (
 	"github.com/golang/protobuf/proto"
 )
 
-func initGame() *gameImpl {
+func initGame(bufferSize int) *gameImpl {
 	var g = gameImpl{}
 	hub := ws.NewHub()
 	g.hub = hub
+	gameconst.BufferSize = bufferSize
 
 	// Setup Object manager
-	g.eventStream = make(chan interface{})
+	g.destroyPlayerStream = make(chan common.DestroyPlayerEvent, bufferSize)
+	g.newPlayerStream = make(chan common.NewPlayerEvent, bufferSize)
+	g.inputStream = make(chan common.ProcessInputEvent, bufferSize)
 	gameMap := mappkg.NewMap(gameconst.BlockWidth, gameconst.BlockHeight)
-	g.objManager = objmanager.NewObjectManager(g.eventStream, gameMap)
+	g.objManager = objmanager.NewObjectManager(g.destroyPlayerStream, gameMap)
 
 	go hub.Run()
 	hub.BindGameMaster(&g)
@@ -73,9 +76,9 @@ func playerRun(g *gameImpl, clientID int32) {
 	}
 }
 
-func benchmarkGame(numcores int, numplayers int, b *testing.B) {
+func benchmarkGame(numcores int, numplayers int, bufferSize int, b *testing.B) {
 	runtime.GOMAXPROCS(numcores)
-	g := initGame()
+	g := initGame(bufferSize)
 	log.SetOutput(ioutil.Discard)
 
 	for np := 0; np < numplayers; np++ {
@@ -87,17 +90,20 @@ func benchmarkGame(numcores int, numplayers int, b *testing.B) {
 		// Update loop
 
 		select {
-		case e := <-g.eventStream:
-			switch v := e.(type) {
-			case common.DestroyPlayerEvent:
-				g.removePlayer(v.PlayerID, v.ClientID)
+		case v := <-g.destroyPlayerStream:
+			log.Println("Remove player", v)
+			g.removePlayer(v.PlayerID, v.ClientID)
+			log.Println("Remove player done", v)
 
-			case common.NewPlayerEvent:
-				g.newPlayerConnect(v.ClientID)
+		case v := <-g.newPlayerStream:
+			log.Println("New player with clientID", v)
+			g.newPlayerConnect(v.ClientID)
+			log.Println("New player with clientID done", v)
 
-			case common.ProcessInputEvent:
-				g.processInput(v.Message)
-			}
+		case v := <-g.inputStream:
+			log.Println("Processs Message", v)
+			g.processInput(v.Message)
+			log.Println("Processs Message done", v)
 
 		case <-ticker.C:
 			g.Update()
@@ -108,6 +114,9 @@ func benchmarkGame(numcores int, numplayers int, b *testing.B) {
 
 }
 
-func BenchmarkGame1Players(b *testing.B)           { benchmarkGame(1, 1, b) }
-func BenchmarkGame50Players(b *testing.B)          { benchmarkGame(1, 50, b) }
-func BenchmarkGame50PlayersMoreCores(b *testing.B) { benchmarkGame(8, 50, b) }
+func BenchmarkGame1Players(b *testing.B)                { benchmarkGame(1, 1, 500, b) }
+func BenchmarkGame50Players(b *testing.B)               { benchmarkGame(1, 50, 500, b) }
+func BenchmarkGame50PlayersMoreCores(b *testing.B)      { benchmarkGame(8, 50, 500, b) }
+func BenchmarkGame1PlayersSize1(b *testing.B)           { benchmarkGame(1, 1, 1, b) }
+func BenchmarkGame50PlayersSize1(b *testing.B)          { benchmarkGame(1, 50, 1, b) }
+func BenchmarkGame50PlayersMoreCoresSize1(b *testing.B) { benchmarkGame(8, 50, 1, b) }

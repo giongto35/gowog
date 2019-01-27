@@ -152,10 +152,10 @@ func (m *objManager) Update() {
 				if player.GetHealth() <= 0 {
 					log.Println("Push remove Player Event to event stream")
 					// TODO: Removeplayer here, don't need send
-					//m.eventStream <- common.DestroyPlayerEvent{
-					//PlayerID: player.GetID(),
-					//ClientID: -1,
-					//}
+					m.destroyPlayerStream <- common.DestroyPlayerEvent{
+						PlayerID: player.GetID(),
+						ClientID: -1,
+					}
 					// Add score for player who shoots
 					if player, ok := m.GetPlayerByID(shoot.GetPlayerID()); ok {
 						player.AddScore()

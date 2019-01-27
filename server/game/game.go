@@ -38,9 +38,9 @@ func NewGame(hub ws.Hub) Game {
 	g.hub = hub
 
 	// Setup Object manager
-	g.destroyPlayerStream = make(chan common.DestroyPlayerEvent)
-	g.newPlayerStream = make(chan common.NewPlayerEvent)
-	g.inputStream = make(chan common.ProcessInputEvent)
+	g.destroyPlayerStream = make(chan common.DestroyPlayerEvent, gameconst.BufferSize)
+	g.newPlayerStream = make(chan common.NewPlayerEvent, gameconst.BufferSize)
+	g.inputStream = make(chan common.ProcessInputEvent, gameconst.BufferSize)
 	gameMap := mappkg.NewMap(gameconst.BlockWidth, gameconst.BlockHeight)
 	g.objManager = objmanager.NewObjectManager(g.destroyPlayerStream, gameMap)
 
@@ -58,21 +58,27 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 	quit = make(chan bool)
 	go func() {
 		for {
+			log.Println("GAME PROCESS")
 			select {
 			case v := <-g.destroyPlayerStream:
 				log.Println("Remove player", v)
 				g.removePlayer(v.PlayerID, v.ClientID)
+				log.Println("Remove player done", v)
 
 			case v := <-g.newPlayerStream:
 				log.Println("New player with clientID", v)
 				g.newPlayerConnect(v.ClientID)
+				log.Println("New player with clientID done", v)
 
 			case v := <-g.inputStream:
 				log.Println("Processs Message", v)
 				g.processInput(v.Message)
+				log.Println("Processs Message done", v)
 
 			case <-ticker.C:
+				log.Println("Update")
 				g.Update()
+				log.Println("Update done")
 
 			case <-quit:
 				ticker.Stop()
@@ -80,6 +86,7 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 
 			default:
 			}
+			log.Println("GAME PROCESS DONE")
 		}
 	}()
 
@@ -93,6 +100,7 @@ func (g *gameImpl) Update() {
 	// Update all object logic
 	g.objManager.Update()
 
+	log.Println("Game send update ")
 	// Send to all clients the updated environment
 	for _, player := range g.objManager.GetPlayers() {
 		log.Println("Update Player ", player.GetPlayerProto())
@@ -103,7 +111,9 @@ func (g *gameImpl) Update() {
 		}
 		encodedMsg, _ := proto.Marshal(updatePlayerMsg)
 		g.hub.Broadcast(encodedMsg)
+		log.Println("Update Player done", player.GetPlayerProto())
 	}
+	log.Println("Game send update done")
 }
 
 // Checking rect circle collision givent the shape
@@ -207,7 +217,7 @@ func (g *gameImpl) newPlayerConnect(clientID int32) {
 	// Send all current players info to new player
 	initAllMsg := g.createInitAllMessage(g.objManager.GetPlayers(), g.objManager.GetMap())
 	encodedMsg, _ := proto.Marshal(initAllMsg)
-	fmt.Println(1, clientID)
+	log.Println(1, clientID)
 	g.hub.Send(clientID, encodedMsg)
 
 	// Send new player client ID
@@ -219,9 +229,9 @@ func (g *gameImpl) newPlayerConnect(clientID int32) {
 		},
 	}
 	encodedMsg, _ = proto.Marshal(registerClientIDMsg)
-	fmt.Println(2, clientID)
+	log.Println(2, clientID)
 	g.hub.Send(clientID, encodedMsg)
-	fmt.Println("Done send 2")
+	log.Println("Done send 2")
 }
 
 // sendShootMsg send shoot event to all clients
@@ -296,10 +306,12 @@ func (g *gameImpl) removePlayer(playerID int32, clientID int32) {
 // It only touch gamelogic, not the clients
 func (g *gameImpl) RemovePlayerByClientID(clientID int32) {
 	// TODO: Might block here, use eventStream for corresponding events
+	fmt.Println("Game Remove player ClientID sent ", clientID, len(g.destroyPlayerStream), g.destroyPlayerStream)
 	g.destroyPlayerStream <- common.DestroyPlayerEvent{
 		ClientID: clientID,
 		PlayerID: -1,
 	}
+	fmt.Println("Game Remove player ClientID done ", clientID)
 }
 
 // GetQuitChannel returns Quit channel for the outside

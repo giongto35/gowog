@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/giongto35/gowog/server/game/gameconst"
 	"github.com/gorilla/websocket"
 )
 
@@ -127,7 +128,7 @@ func NewClient(upgrader websocket.Upgrader, hub Hub, w http.ResponseWriter, r *h
 		return -1
 	}
 	// TODO: disconnect and reconnect cause deadlock
-	client := &clientImpl{id: rand.Int31(), hub: hub, conn: conn, send: make(chan []byte)}
+	client := &clientImpl{id: rand.Int31(), hub: hub, conn: conn, send: make(chan []byte, gameconst.BufferSize)}
 	// We need to register client from hub.
 	client.hub.Register(client)
 	//client.id = <-clientIDChan
