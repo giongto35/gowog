@@ -5,6 +5,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/giongto35/gowog/server/game/common"
 	"github.com/giongto35/gowog/server/game/gameconst"
 	"github.com/giongto35/gowog/server/game/mappkg"
 	"github.com/giongto35/gowog/server/game/playerpkg"
@@ -20,14 +21,14 @@ type objManager struct {
 	numShoot  int64
 
 	// Stream for all game event
-	eventStream chan interface{}
+	destroyPlayerStream chan common.DestroyPlayerEvent
 }
 
-func NewObjectManager(eventStream chan interface{}, gameMap mappkg.Map) ObjectManager {
+func NewObjectManager(eventStream chan common.DestroyPlayerEvent, gameMap mappkg.Map) ObjectManager {
 	objManager := objManager{}
 	objManager.players = map[int32]playerpkg.Player{}
 	objManager.shoots = map[playerpkg.Player][]shootpkg.Shoot{}
-	objManager.eventStream = eventStream
+	objManager.destroyPlayerStream = eventStream
 	objManager.gameMap = gameMap
 
 	return &objManager

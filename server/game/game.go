@@ -24,10 +24,12 @@ import (
 )
 
 type gameImpl struct {
-	hub         ws.Hub
-	eventStream chan interface{}
-	objManager  objmanager.ObjectManager
-	quitChannel chan bool
+	hub                 ws.Hub
+	destroyPlayerStream chan common.DestroyPlayerEvent
+	newPlayerStream     chan common.NewPlayerEvent
+	inputStream         chan common.ProcessInputEvent
+	objManager          objmanager.ObjectManager
+	quitChannel         chan bool
 }
 
 // NewGame create new game master
@@ -36,9 +38,11 @@ func NewGame(hub ws.Hub) Game {
 	g.hub = hub
 
 	// Setup Object manager
-	g.eventStream = make(chan interface{})
+	g.destroyPlayerStream = make(chan common.DestroyPlayerEvent)
+	g.newPlayerStream = make(chan common.NewPlayerEvent)
+	g.inputStream = make(chan common.ProcessInputEvent)
 	gameMap := mappkg.NewMap(gameconst.BlockWidth, gameconst.BlockHeight)
-	g.objManager = objmanager.NewObjectManager(g.eventStream, gameMap)
+	g.objManager = objmanager.NewObjectManager(g.destroyPlayerStream, gameMap)
 
 	go hub.Run()
 	g.quitChannel = g.gameUpdate()
@@ -55,20 +59,17 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 	go func() {
 		for {
 			select {
-			case e := <-g.eventStream:
-				switch v := e.(type) {
-				case common.DestroyPlayerEvent:
-					log.Println("Remove player", v)
-					g.removePlayer(v.PlayerID, v.ClientID)
+			case v := <-g.destroyPlayerStream:
+				log.Println("Remove player", v)
+				g.removePlayer(v.PlayerID, v.ClientID)
 
-				case common.NewPlayerEvent:
-					log.Println("New player with clientID", v)
-					g.newPlayerConnect(v.ClientID)
+			case v := <-g.newPlayerStream:
+				log.Println("New player with clientID", v)
+				g.newPlayerConnect(v.ClientID)
 
-				case common.ProcessInputEvent:
-					log.Println("Processs Message", v)
-					g.processInput(v.Message)
-				}
+			case v := <-g.inputStream:
+				log.Println("Processs Message", v)
+				g.processInput(v.Message)
 
 			case <-ticker.C:
 				g.Update()
@@ -126,7 +127,7 @@ func (g *gameImpl) dist(x1, y1, x2, y2 float32) float32 {
 
 // ProcessInput receive the message from client and put it to queue
 func (g *gameImpl) ProcessInput(message []byte) {
-	g.eventStream <- common.ProcessInputEvent{Message: message}
+	g.inputStream <- common.ProcessInputEvent{Message: message}
 }
 
 // ProcessInput logic to process ProcessInputEvent messsage
@@ -198,7 +199,7 @@ func (g *gameImpl) createInitAllMessage(players []playerpkg.Player, gameMap mapp
 // NewPlayerConnect is when new socket joins, we send all of the current player to it
 // Put it into Channel
 func (g *gameImpl) NewPlayerConnect(clientID int32) {
-	g.eventStream <- common.NewPlayerEvent{ClientID: clientID}
+	g.newPlayerStream <- common.NewPlayerEvent{ClientID: clientID}
 }
 
 // newPlayerConnect is when new socket joins, we send all of the current player to it
@@ -295,7 +296,7 @@ func (g *gameImpl) removePlayer(playerID int32, clientID int32) {
 // It only touch gamelogic, not the clients
 func (g *gameImpl) RemovePlayerByClientID(clientID int32) {
 	// TODO: Might block here, use eventStream for corresponding events
-	g.eventStream <- common.DestroyPlayerEvent{
+	g.destroyPlayerStream <- common.DestroyPlayerEvent{
 		ClientID: clientID,
 		PlayerID: -1,
 	}
