@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -42,8 +43,8 @@ type registerClientEvent struct {
 
 func NewHub() Hub {
 	return &hubImpl{
-		singleMsgStream:    make(chan singleMessage, 500),
-		broadcastMsgStream: make(chan broadcastMessage, 500),
+		singleMsgStream:    make(chan singleMessage, 1),
+		broadcastMsgStream: make(chan broadcastMessage, 1),
 		register:           make(chan registerClientEvent),
 		unregister:         make(chan Client),
 		clients:            make(map[int32]Client),
@@ -63,9 +64,11 @@ func (h *hubImpl) Run() {
 			h.clients[client.GetID()] = client
 
 		case client := <-h.unregister:
-			h.game.RemovePlayerByClientID(client.GetID())
+			// TODO: BUG HERE, deadlock
+			//h.game.RemovePlayerByClientID(client.GetID())
 			// send to game event stream
 			delete(h.clients, client.GetID())
+			fmt.Println("Close client ", client.GetID())
 			client.Close()
 
 		case serverMessage := <-h.broadcastMsgStream:
@@ -77,14 +80,25 @@ func (h *hubImpl) Run() {
 					continue
 				}
 				log.Println("   to ", id)
-				client.GetSend() <- serverMessage.msg
+				select {
+				case client.GetSend() <- serverMessage.msg:
+				default:
+					//Handle this case properly , causing deadlock
+					log.Println("Sended to close channel", id)
+					//client.Close()
+				}
 			}
 
 		case serverMessage := <-h.singleMsgStream:
 			// Sending single message exclude serverMessage.clientID
 			log.Println("Sending single message to ", serverMessage.clientID)
 			if client, ok := h.clients[serverMessage.clientID]; ok {
-				client.GetSend() <- serverMessage.msg
+				fmt.Println("NUM CLIENTS", len(h.clients))
+				select {
+				case client.GetSend() <- serverMessage.msg:
+					//default:
+					//log.Println("Sended to close channel", client)
+				}
 			}
 		}
 	}
@@ -105,6 +119,7 @@ func (h *hubImpl) ReceiveMessage(message []byte) {
 }
 
 func (h *hubImpl) Send(clientID int32, b []byte) {
+	// TODO: Unblock here
 	h.singleMsgStream <- singleMessage{clientID: clientID, msg: b}
 }
 

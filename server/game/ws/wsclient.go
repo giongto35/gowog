@@ -44,7 +44,7 @@ type clientImpl struct {
 // reads from this goroutine.
 func (c *clientImpl) ReadPump() {
 	defer func() {
-		log.Println("Close readpump")
+		log.Println("Close readpump", c.GetID())
 		c.hub.UnRegister(c)
 		c.conn.Close()
 	}()
@@ -80,20 +80,20 @@ func (c *clientImpl) WritePump() {
 			if !ok {
 				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
-				fmt.Println("Write pump closed")
+				fmt.Println("Write pump closed", c.GetID())
 				return
 			}
 
 			w, err := c.conn.NextWriter(websocket.BinaryMessage)
 			if err != nil {
-				fmt.Println("Write pump closed", err)
+				fmt.Println("Write pump closed ", c.GetID(), err)
 				return
 			}
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
 			if err := w.Close(); err != nil {
-				fmt.Println("Write pump closed", err)
+				fmt.Println("Write pump cannot closed", c.GetID(), err)
 				return
 			}
 		}

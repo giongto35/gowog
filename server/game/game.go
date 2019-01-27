@@ -4,6 +4,7 @@ package game
 // For each event it received, it will do game logic and sending message to other.
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"runtime"
@@ -205,6 +206,7 @@ func (g *gameImpl) newPlayerConnect(clientID int32) {
 	// Send all current players info to new player
 	initAllMsg := g.createInitAllMessage(g.objManager.GetPlayers(), g.objManager.GetMap())
 	encodedMsg, _ := proto.Marshal(initAllMsg)
+	fmt.Println(1, clientID)
 	g.hub.Send(clientID, encodedMsg)
 
 	// Send new player client ID
@@ -216,7 +218,9 @@ func (g *gameImpl) newPlayerConnect(clientID int32) {
 		},
 	}
 	encodedMsg, _ = proto.Marshal(registerClientIDMsg)
+	fmt.Println(2, clientID)
 	g.hub.Send(clientID, encodedMsg)
+	fmt.Println("Done send 2")
 }
 
 // sendShootMsg send shoot event to all clients
@@ -256,12 +260,15 @@ func (g *gameImpl) initPlayer(clientID int32, name string) {
 		},
 	}
 	encodedMsg, _ := proto.Marshal(initPlayerMsg)
+	fmt.Println("0")
 	g.hub.Send(clientID, encodedMsg)
 
 	// Send all other players about new player info
 	initPlayerMsg.GetInitPlayerPayload().IsMain = false
 	encodedMsg, _ = proto.Marshal(initPlayerMsg)
+	fmt.Println("broadcast 0.5")
 	g.hub.BroadcastExclude(encodedMsg, clientID)
+	fmt.Println("Done broadcast 0.5")
 }
 
 //  removePlayer remove player logic from game using player ID
@@ -287,6 +294,7 @@ func (g *gameImpl) removePlayer(playerID int32, clientID int32) {
 // RemovePlayerByClientID remove player from game using Client ID
 // It only touch gamelogic, not the clients
 func (g *gameImpl) RemovePlayerByClientID(clientID int32) {
+	// TODO: Might block here, use eventStream for corresponding events
 	g.eventStream <- common.DestroyPlayerEvent{
 		ClientID: clientID,
 		PlayerID: -1,
