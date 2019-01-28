@@ -71,7 +71,7 @@ func (h *hubImpl) Run() {
 		case client := <-h.unregister:
 			// TODO: BUG HERE, deadlock
 			log.Println("Close client ", client.GetID())
-			//h.game.RemovePlayerByClientID(client.GetID())
+			h.game.RemovePlayerByClientID(client.GetID())
 			log.Println("Close client done", client.GetID())
 			// send to game event stream
 			delete(h.clients, client.GetID())
@@ -142,6 +142,9 @@ func (h *hubImpl) BroadcastExclude(b []byte, excludeID int32) {
 
 func (h *hubImpl) broadcast(b []byte, excludeID int32) {
 	log.Println("Hub broadcasting message ", len(h.broadcastMsgStream))
-	h.broadcastMsgStream <- broadcastMessage{excludeID: excludeID, msg: b}
+	select {
+	case h.broadcastMsgStream <- broadcastMessage{excludeID: excludeID, msg: b}:
+	default:
+	}
 	log.Println("Hub broadcasting done")
 }
