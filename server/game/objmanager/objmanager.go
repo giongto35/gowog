@@ -5,6 +5,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/giongto35/gowog/server/game/common"
 	"github.com/giongto35/gowog/server/game/gameconst"
 	"github.com/giongto35/gowog/server/game/mappkg"
 	"github.com/giongto35/gowog/server/game/playerpkg"
@@ -19,16 +20,19 @@ type objManager struct {
 	numPlayer int32
 	numShoot  int64
 
+	game IGame
+
 	// Stream for all game event
-	eventStream chan interface{}
+	destroyPlayerStream chan common.DestroyPlayerEvent
 }
 
-func NewObjectManager(eventStream chan interface{}, gameMap mappkg.Map) ObjectManager {
+func NewObjectManager(game IGame, eventStream chan common.DestroyPlayerEvent, gameMap mappkg.Map) ObjectManager {
 	objManager := objManager{}
 	objManager.players = map[int32]playerpkg.Player{}
 	objManager.shoots = map[playerpkg.Player][]shootpkg.Shoot{}
-	objManager.eventStream = eventStream
+	objManager.destroyPlayerStream = eventStream
 	objManager.gameMap = gameMap
+	objManager.game = game
 
 	return &objManager
 }
@@ -151,10 +155,7 @@ func (m *objManager) Update() {
 				if player.GetHealth() <= 0 {
 					log.Println("Push remove Player Event to event stream")
 					// TODO: Removeplayer here, don't need send
-					//m.eventStream <- common.DestroyPlayerEvent{
-					//PlayerID: player.GetID(),
-					//ClientID: -1,
-					//}
+					m.game.RemovePlayer(player.GetID(), -1)
 					// Add score for player who shoots
 					if player, ok := m.GetPlayerByID(shoot.GetPlayerID()); ok {
 						player.AddScore()

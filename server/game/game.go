@@ -4,6 +4,7 @@ package game
 // For each event it received, it will do game logic and sending message to other.
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"runtime"
@@ -23,10 +24,12 @@ import (
 )
 
 type gameImpl struct {
-	hub         ws.Hub
-	eventStream chan interface{}
-	objManager  objmanager.ObjectManager
-	quitChannel chan bool
+	hub                 ws.Hub
+	destroyPlayerStream chan common.DestroyPlayerEvent
+	newPlayerStream     chan common.NewPlayerEvent
+	inputStream         chan common.ProcessInputEvent
+	objManager          objmanager.ObjectManager
+	quitChannel         chan bool
 }
 
 // NewGame create new game master
@@ -35,9 +38,11 @@ func NewGame(hub ws.Hub) Game {
 	g.hub = hub
 
 	// Setup Object manager
-	g.eventStream = make(chan interface{})
+	g.destroyPlayerStream = make(chan common.DestroyPlayerEvent, gameconst.BufferSize)
+	g.newPlayerStream = make(chan common.NewPlayerEvent, gameconst.BufferSize)
+	g.inputStream = make(chan common.ProcessInputEvent, gameconst.BufferSize)
 	gameMap := mappkg.NewMap(gameconst.BlockWidth, gameconst.BlockHeight)
-	g.objManager = objmanager.NewObjectManager(g.eventStream, gameMap)
+	g.objManager = objmanager.NewObjectManager(&g, g.destroyPlayerStream, gameMap)
 
 	go hub.Run()
 	g.quitChannel = g.gameUpdate()
@@ -53,24 +58,27 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 	quit = make(chan bool)
 	go func() {
 		for {
+			log.Println("GAME PROCESS")
 			select {
-			case e := <-g.eventStream:
-				switch v := e.(type) {
-				case common.DestroyPlayerEvent:
-					log.Println("Remove player", v)
-					g.removePlayer(v.PlayerID, v.ClientID)
+			case v := <-g.destroyPlayerStream:
+				log.Println("Remove player", v)
+				g.removePlayer(v.PlayerID, v.ClientID)
+				log.Println("Remove player done", v)
 
-				case common.NewPlayerEvent:
-					log.Println("New player with clientID", v)
-					g.newPlayerConnect(v.ClientID)
+			case v := <-g.newPlayerStream:
+				log.Println("New player with clientID", v)
+				g.newPlayerConnect(v.ClientID)
+				log.Println("New player with clientID done", v)
 
-				case common.ProcessInputEvent:
-					log.Println("Processs Message", v)
-					g.processInput(v.Message)
-				}
+			case v := <-g.inputStream:
+				log.Println("Processs Message", v)
+				g.processInput(v.Message)
+				log.Println("Processs Message done", v)
 
 			case <-ticker.C:
+				log.Println("Update")
 				g.Update()
+				log.Println("Update done")
 
 			case <-quit:
 				ticker.Stop()
@@ -78,6 +86,7 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 
 			default:
 			}
+			log.Println("GAME PROCESS DONE")
 		}
 	}()
 
@@ -91,6 +100,7 @@ func (g *gameImpl) Update() {
 	// Update all object logic
 	g.objManager.Update()
 
+	log.Println("Game send update ")
 	// Send to all clients the updated environment
 	for _, player := range g.objManager.GetPlayers() {
 		log.Println("Update Player ", player.GetPlayerProto())
@@ -101,7 +111,9 @@ func (g *gameImpl) Update() {
 		}
 		encodedMsg, _ := proto.Marshal(updatePlayerMsg)
 		g.hub.Broadcast(encodedMsg)
+		log.Println("Update Player done", player.GetPlayerProto())
 	}
+	log.Println("Game send update done")
 }
 
 // Checking rect circle collision givent the shape
@@ -125,7 +137,7 @@ func (g *gameImpl) dist(x1, y1, x2, y2 float32) float32 {
 
 // ProcessInput receive the message from client and put it to queue
 func (g *gameImpl) ProcessInput(message []byte) {
-	g.eventStream <- common.ProcessInputEvent{Message: message}
+	g.inputStream <- common.ProcessInputEvent{Message: message}
 }
 
 // ProcessInput logic to process ProcessInputEvent messsage
@@ -197,7 +209,7 @@ func (g *gameImpl) createInitAllMessage(players []playerpkg.Player, gameMap mapp
 // NewPlayerConnect is when new socket joins, we send all of the current player to it
 // Put it into Channel
 func (g *gameImpl) NewPlayerConnect(clientID int32) {
-	g.eventStream <- common.NewPlayerEvent{ClientID: clientID}
+	g.newPlayerStream <- common.NewPlayerEvent{ClientID: clientID}
 }
 
 // newPlayerConnect is when new socket joins, we send all of the current player to it
@@ -205,6 +217,7 @@ func (g *gameImpl) newPlayerConnect(clientID int32) {
 	// Send all current players info to new player
 	initAllMsg := g.createInitAllMessage(g.objManager.GetPlayers(), g.objManager.GetMap())
 	encodedMsg, _ := proto.Marshal(initAllMsg)
+	log.Println(1, clientID)
 	g.hub.Send(clientID, encodedMsg)
 
 	// Send new player client ID
@@ -216,7 +229,9 @@ func (g *gameImpl) newPlayerConnect(clientID int32) {
 		},
 	}
 	encodedMsg, _ = proto.Marshal(registerClientIDMsg)
+	log.Println(2, clientID)
 	g.hub.Send(clientID, encodedMsg)
+	log.Println("Done send 2")
 }
 
 // sendShootMsg send shoot event to all clients
@@ -256,12 +271,15 @@ func (g *gameImpl) initPlayer(clientID int32, name string) {
 		},
 	}
 	encodedMsg, _ := proto.Marshal(initPlayerMsg)
+	fmt.Println("0")
 	g.hub.Send(clientID, encodedMsg)
 
 	// Send all other players about new player info
 	initPlayerMsg.GetInitPlayerPayload().IsMain = false
 	encodedMsg, _ = proto.Marshal(initPlayerMsg)
+	fmt.Println("broadcast 0.5")
 	g.hub.BroadcastExclude(encodedMsg, clientID)
+	fmt.Println("Done broadcast 0.5")
 }
 
 //  removePlayer remove player logic from game using player ID
@@ -282,15 +300,27 @@ func (g *gameImpl) removePlayer(playerID int32, clientID int32) {
 	encodedMsg, _ := proto.Marshal(removePlayerMsg)
 	log.Println("Send Remove Player Message ", removePlayerMsg)
 	g.hub.Broadcast(encodedMsg)
+	log.Println("Send Remove Player Message Done")
+}
+
+//  removePlayer remove player logic from game using player ID
+//  This is game logic which
+//    + Remove player from playerList
+//    + Broadcast remove event to other
+func (g *gameImpl) RemovePlayer(playerID int32, clientID int32) {
+	g.removePlayer(playerID, clientID)
 }
 
 // RemovePlayerByClientID remove player from game using Client ID
 // It only touch gamelogic, not the clients
 func (g *gameImpl) RemovePlayerByClientID(clientID int32) {
-	g.eventStream <- common.DestroyPlayerEvent{
+	// TODO: Might block here, use eventStream for corresponding events
+	fmt.Println("Game Remove player ClientID sent ", clientID, len(g.destroyPlayerStream), g.destroyPlayerStream)
+	g.destroyPlayerStream <- common.DestroyPlayerEvent{
 		ClientID: clientID,
 		PlayerID: -1,
 	}
+	fmt.Println("Game Remove player ClientID done ", clientID)
 }
 
 // GetQuitChannel returns Quit channel for the outside

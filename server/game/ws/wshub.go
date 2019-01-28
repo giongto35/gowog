@@ -3,6 +3,8 @@ package ws
 import (
 	"fmt"
 	"log"
+
+	"github.com/giongto35/gowog/server/game/gameconst"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -10,9 +12,6 @@ import (
 type hubImpl struct {
 	// Registered clients.
 	clients map[int32]Client
-
-	// msgStream fetching messages from the clients.
-	msgStream chan []byte
 
 	// register fetching register event and process it
 	register chan registerClientEvent
@@ -46,11 +45,10 @@ type registerClientEvent struct {
 
 func NewHub() Hub {
 	return &hubImpl{
-		msgStream:          make(chan []byte, 500),
-		singleMsgStream:    make(chan singleMessage, 500),
-		broadcastMsgStream: make(chan broadcastMessage, 500),
-		register:           make(chan registerClientEvent),
-		unregister:         make(chan Client),
+		singleMsgStream:    make(chan singleMessage, gameconst.BufferSize),
+		broadcastMsgStream: make(chan broadcastMessage, gameconst.BufferSize),
+		register:           make(chan registerClientEvent, gameconst.BufferSize),
+		unregister:         make(chan Client, gameconst.BufferSize),
 		clients:            make(map[int32]Client),
 	}
 }
@@ -62,37 +60,56 @@ func (h *hubImpl) BindGameMaster(game IGame) {
 func (h *hubImpl) Run() {
 	log.Println("Hub is running")
 	for {
+		log.Println("HUB PROCESS")
 		select {
 		case register := <-h.register:
+			log.Println("HUB register", register.client.GetID())
 			client := register.client
-			fmt.Println("REgisterd", client)
 			h.clients[client.GetID()] = client
+			log.Println("HUB register done")
 
 		case client := <-h.unregister:
+			// TODO: BUG HERE, deadlock
+			log.Println("Close client ", client.GetID())
 			h.game.RemovePlayerByClientID(client.GetID())
+			log.Println("Close client done", client.GetID())
 			// send to game event stream
 			delete(h.clients, client.GetID())
 			client.Close()
 
 		case serverMessage := <-h.broadcastMsgStream:
 			// Broadcast message exclude serverMessage.clientID
-			log.Println("Broadcast message ")
+			log.Println("Hub Broadcast message ")
 			excludeID := serverMessage.excludeID
 			for id, client := range h.clients {
 				if id == excludeID {
 					continue
 				}
 				log.Println("   to ", id)
-				client.GetSend() <- serverMessage.msg
+				select {
+				case client.GetSend() <- serverMessage.msg:
+				default:
+					//Handle this case properly , causing deadlock
+					log.Println("Sended to close channel", id)
+					//client.Close()
+				}
 			}
+			log.Println("Hub Broadcast message done")
 
 		case serverMessage := <-h.singleMsgStream:
 			// Sending single message exclude serverMessage.clientID
 			log.Println("Sending single message to ", serverMessage.clientID)
 			if client, ok := h.clients[serverMessage.clientID]; ok {
-				client.GetSend() <- serverMessage.msg
+				fmt.Println("NUM CLIENTS", len(h.clients))
+				select {
+				case client.GetSend() <- serverMessage.msg:
+					//default:
+					//log.Println("Sended to close channel", client)
+				}
 			}
+			log.Println("Sending single message to ", serverMessage.clientID, " done")
 		}
+		log.Println("HUB DONE")
 	}
 }
 
@@ -106,10 +123,12 @@ func (h *hubImpl) UnRegister(c Client) {
 }
 
 func (h *hubImpl) ReceiveMessage(message []byte) {
+	// Not send to hub channel because this call go directly to game
 	h.game.ProcessInput(message)
 }
 
 func (h *hubImpl) Send(clientID int32, b []byte) {
+	// TODO: Unblock here
 	h.singleMsgStream <- singleMessage{clientID: clientID, msg: b}
 }
 
@@ -122,5 +141,7 @@ func (h *hubImpl) BroadcastExclude(b []byte, excludeID int32) {
 }
 
 func (h *hubImpl) broadcast(b []byte, excludeID int32) {
+	log.Println("Hub broadcasting message ", len(h.broadcastMsgStream))
 	h.broadcastMsgStream <- broadcastMessage{excludeID: excludeID, msg: b}
+	log.Println("Hub broadcasting done")
 }

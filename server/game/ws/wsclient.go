@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/giongto35/gowog/server/game/gameconst"
 	"github.com/gorilla/websocket"
 )
 
@@ -44,7 +45,7 @@ type clientImpl struct {
 // reads from this goroutine.
 func (c *clientImpl) ReadPump() {
 	defer func() {
-		log.Println("Close readpump")
+		log.Println("Close readpump", c.GetID())
 		c.hub.UnRegister(c)
 		c.conn.Close()
 	}()
@@ -68,28 +69,33 @@ func (c *clientImpl) ReadPump() {
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
 func (c *clientImpl) WritePump() {
+	defer func() {
+		c.conn.Close()
+	}()
+
 	for {
 		select {
 		case message, ok := <-c.send:
+			// NOTE: if there is remaining in send, will cause deadlock
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
-				fmt.Println("Write pump closed")
-				break
+				fmt.Println("Write pump closed", c.GetID())
+				return
 			}
 
 			w, err := c.conn.NextWriter(websocket.BinaryMessage)
 			if err != nil {
-				fmt.Println("Write pump closed", err)
-				break
+				fmt.Println("Write pump closed ", c.GetID(), err)
+				return
 			}
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
 			if err := w.Close(); err != nil {
-				fmt.Println("Write pump closed", err)
-				break
+				fmt.Println("Write pump cannot closed", c.GetID(), err)
+				return
 			}
 		}
 	}
@@ -122,7 +128,7 @@ func NewClient(upgrader websocket.Upgrader, hub Hub, w http.ResponseWriter, r *h
 		return -1
 	}
 	// TODO: disconnect and reconnect cause deadlock
-	client := &clientImpl{id: rand.Int31(), hub: hub, conn: conn, send: make(chan []byte)}
+	client := &clientImpl{id: rand.Int31(), hub: hub, conn: conn, send: make(chan []byte, gameconst.BufferSize)}
 	// We need to register client from hub.
 	client.hub.Register(client)
 	//client.id = <-clientIDChan

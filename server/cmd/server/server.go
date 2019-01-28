@@ -32,7 +32,7 @@ func connect(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// Running on one core only
-	runtime.GOMAXPROCS(3)
+	runtime.GOMAXPROCS(2)
 	flag.Parse()
 	if *disablelog {
 		log.SetOutput(ioutil.Discard)

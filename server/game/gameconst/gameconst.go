@@ -15,3 +15,6 @@ const ShootHeight = 20
 // Map const
 const BlockWidth = 64
 const BlockHeight = 64
+
+// Settings
+var BufferSize = 50
