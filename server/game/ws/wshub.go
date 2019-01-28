@@ -142,9 +142,6 @@ func (h *hubImpl) BroadcastExclude(b []byte, excludeID int32) {
 
 func (h *hubImpl) broadcast(b []byte, excludeID int32) {
 	log.Println("Hub broadcasting message ", len(h.broadcastMsgStream))
-	select {
-	case h.broadcastMsgStream <- broadcastMessage{excludeID: excludeID, msg: b}:
-	default:
-	}
+	h.broadcastMsgStream <- broadcastMessage{excludeID: excludeID, msg: b}
 	log.Println("Hub broadcasting done")
 }
