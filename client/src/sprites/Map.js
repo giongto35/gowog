@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import effect from './Effect';
 
 export default class extends Phaser.Sprite {
   constructor ({ game, layer, blockWidth, blockHeight, numCols, numRows, blocks}) {
@@ -22,11 +23,20 @@ export default class extends Phaser.Sprite {
       for (var j = 0; j < this.numCols; j++) {
         var idx = i * this.numCols + j;
         if (blocks[idx] !== 0) {
-          var graphic = new Phaser.Graphics(game, 0, 0);
-          graphic.lineStyle(2, 0x000000);
-          graphic.beginFill(0xFF0000, 1);
-          graphic.drawRect(blockWidth * j, blockHeight * i, blockWidth, blockHeight);
+          var graphic = game.add.sprite(0, 0, 'wall');
+          graphic.width = blockWidth;
+          graphic.height = blockHeight;
+          graphic.x = blockWidth * j
+          graphic.y = blockWidth * i
+
+          //var graphic = new Phaser.Graphics(game, 0, 0);
+          //graphic.lineStyle(2, 0x000000);
+          //graphic.beginFill(0xFF0000, 1);
+          //graphic.drawRect(blockWidth * j, blockHeight * i, blockWidth, blockHeight);
           this.addChild(graphic);
+
+          this.glowFilter = new Phaser.Filter.Glow(game);
+          graphic.filters = [ this.glowFilter ];
 
           this.graphicBlocks.push(graphic);
           this.rectBlocks.push(

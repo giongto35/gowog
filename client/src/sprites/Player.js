@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import Shoot from './Shoot';
 import config from '../config';
+import effect from './Effect';
 
 export default class extends Phaser.Sprite {
   constructor ({ game, layer, id, name, x, y, asset }) {
@@ -15,19 +16,24 @@ export default class extends Phaser.Sprite {
     this.score = 0;
 
     // Setup circle graphic for player
-    var graphics = new Phaser.Graphics(game, 0, 0);
-    graphics.lineStyle(2, 0x000000);
-    graphics.beginFill(0x0000FF, 1);
-    graphics.drawCircle(0, 0, config.playerSize);
+    //var graphics = new Phaser.Graphics(game, 0, 0);
+    //graphics.lineStyle(2, 0x000000);
+    //graphics.beginFill(0x0000FF, 1);
+    //graphics.drawCircle(0, 0, config.playerSize);
 
-    var texture = game.add.sprite(0, 0, 'vietnam');
-    texture.anchor.setTo(0.5, 0.5);
-    texture.width = config.playerSize;
-    texture.height = config.playerSize;
-    texture.mask = graphics;
+    //var texture = game.add.sprite(0, 0, 'vietnam');
+    //texture.anchor.setTo(0.5, 0.5);
+    //texture.width = config.playerSize;
+    //texture.height = config.playerSize;
+    //texture.mask = graphics;
 
-    this.addChild(graphics);
-    this.addChild(texture);
+    //this.addChild(graphics);
+    //this.addChild(texture);
+    this.graphic = game.add.sprite(0, 0, 'player');
+    this.graphic.width = config.playerSize;
+    this.graphic.height = config.playerSize;
+    this.graphic.anchor.setTo(0.5, 0.5);
+    this.addChild(this.graphic);
 
     this.shootManager = new Shoot({
       game: game,
@@ -42,6 +48,17 @@ export default class extends Phaser.Sprite {
     this.anchor.setTo(0.5, 0.5);
 
     game.add.existing(this);
+
+    // Particle effects
+    this.emitter = game.add.emitter(this.x, this.y, 200);
+    this.emitter.makeParticles('player');
+    this.emitter.gravity = 0;
+    this.emitter.autoScale = false;
+    this.emitter.setScale(0.2, 0.1, 0.2, 0.1, 1500, Phaser.Easing.Linear.None)
+    this.emitter.setRotation(0.0, 0.0);
+    this.emitter.setAlpha(0.5, 0, 1500, Phaser.Easing.Linear.None, false);
+    this.emitter.start(false, 5000, 100);
+    layer.add(this.emitter);
 
     // Healthbar
     this.health = 100.0;
@@ -65,10 +82,17 @@ export default class extends Phaser.Sprite {
     this.game.physics.enable(this, Phaser.Physics.ARCADE);
 
     layer.add(this);
+
+    // Add Neon effect to graphic only
+    //this.glowFilter = new Phaser.Filter.Glow(game);
+    //this.graphic.filters = [ this.glowFilter ];
   }
 
   update () {
     this.healthbar.width = this.health / 100 * 150;
+    //this.glowFilter.update();
+    this.emitter.x = this.x;
+    this.emitter.y = this.y;
   }
 
   fire (x, y, dx, dy) {

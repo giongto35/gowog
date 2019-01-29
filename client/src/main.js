@@ -10,7 +10,7 @@ import config from './config';
 class Game extends Phaser.Game {
   constructor () {
     // TODO: fullscreen but keep ratio
-    super(config.screenWidth, config.screnHeight, Phaser.CANVAS, 'content', null);
+    super(config.screenWidth, config.screnHeight, Phaser.WEBGL, 'content', null);
 
     this.state.add('Boot', BootState, false);
     this.state.add('Splash', SplashState, false);

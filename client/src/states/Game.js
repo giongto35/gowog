@@ -37,9 +37,10 @@ export default class extends Phaser.State {
     this.game.scale.refresh();
 
     // Remove background
-    this.land = this.game.add.tileSprite(0, 0, config.screenWidth, config.screenHeight, 'maptile');
-    this.land.fixedToCamera = true;
-    this.backgroundLayer.add(this.land);
+    //this.land = this.game.add.tileSprite(0, 0, config.screenWidth, config.screenHeight, 'maptile');
+    //this.land.fixedToCamera = true;
+    //this.backgroundLayer.add(this.land);
+    this.game.stage.backgroundColor = '#000000';
 
     // Game world bound
     this.game.world.setBounds(0, 0, 19200, 19200);
@@ -65,7 +66,9 @@ export default class extends Phaser.State {
 
     this.cntSeqNum = 0;
     this.pending_inputs = [];
+    var emitter = this.game.add.emitter(200, 200, 200);
 
+    this.uiLayer.add(emitter);
     this.setupEvent(this.socket, this);
   }
 
@@ -159,8 +162,8 @@ export default class extends Phaser.State {
     }
 
     // Handle game logic
-    this.land.tilePosition.x = -this.game.camera.x;
-    this.land.tilePosition.y = -this.game.camera.y;
+    //this.land.tilePosition.x = -this.game.camera.x;
+    //this.land.tilePosition.y = -this.game.camera.y;
 
     // Handle collision
     // Check bullet hit player
@@ -342,6 +345,7 @@ export default class extends Phaser.State {
     player.healthbar.destroy();
     player.nametag.destroy();
     player.shootManager.destroy();
+    player.emitter.destroy();
     this.objectLayer.remove(player);
 
     if (player === this.player) {
