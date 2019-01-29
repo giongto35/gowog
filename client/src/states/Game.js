@@ -1,6 +1,7 @@
 /* globals __DEV__ */
 import Phaser from 'phaser';
 import Player from '../sprites/Player';
+import explode from '../sprites/Effect';
 import Map from '../sprites/Map';
 import Leaderboard from '../sprites/Leaderboard';
 import messagepb from './message_pb';
@@ -340,12 +341,15 @@ export default class extends Phaser.State {
       this.playerList.filter(player => player.id !== playerID);
     }
 
+    // Player clean
     player.destroy();
     player.removeChildren(0, player.length);
     player.healthbar.destroy();
     player.nametag.destroy();
     player.shootManager.destroy();
     player.emitter.destroy();
+    // Exploding effect
+    explode(this.game, this.uiLayer, player.x, player.y);
     this.objectLayer.remove(player);
 
     if (player === this.player) {

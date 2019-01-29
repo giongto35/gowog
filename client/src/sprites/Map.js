@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import effect from './Effect';
+import effect from './Shader';
 
 export default class extends Phaser.Sprite {
   constructor ({ game, layer, blockWidth, blockHeight, numCols, numRows, blocks}) {
