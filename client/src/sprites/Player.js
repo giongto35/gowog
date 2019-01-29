@@ -51,7 +51,7 @@ export default class extends Phaser.Sprite {
 
     // Particle effects
     this.emitter = game.add.emitter(this.x, this.y, 200);
-    this.emitter.makeParticles('player');
+    this.emitter.makeParticles('player_particle');
     this.emitter.gravity = 0;
     this.emitter.autoScale = false;
     this.emitter.setScale(0.2, 0.1, 0.2, 0.1, 1500, Phaser.Easing.Linear.None)
