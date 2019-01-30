@@ -1,7 +1,7 @@
 /* globals __DEV__ */
 import Phaser from 'phaser';
 import Player from '../sprites/Player';
-import explode from '../sprites/Effect';
+import * as effect from '../sprites/Effect';
 import Map from '../sprites/Map';
 import Leaderboard from '../sprites/Leaderboard';
 import messagepb from './message_pb';
@@ -180,10 +180,12 @@ export default class extends Phaser.State {
       player.shootManager.forEachAlive(bullet => {
         // Check if bullet is in Map
         if (!this.isInMap(bullet.position.x, bullet.position.y)) {
+          effect.explode_bullet(this.game, this.uiLayer, bullet.position.x, bullet.position.y);
           bullet.kill();
         }
         // Check if bullet hit block
         if (this.isBulletHitBlock(bullet.position.x, bullet.position.y)) {
+          effect.explode_bullet(this.game, this.uiLayer, bullet.position.x, bullet.position.y);
           bullet.kill();
         }
       });
@@ -229,6 +231,7 @@ export default class extends Phaser.State {
   }
 
   bulletHitEnemy (tank, bullet) {
+    effect.explode_bullet(this.game, this.uiLayer, bullet.position.x, bullet.position.y);
     bullet.kill();
   }
 
@@ -349,7 +352,7 @@ export default class extends Phaser.State {
     player.shootManager.destroy();
     player.emitter.destroy();
     // Exploding effect
-    explode(this.game, this.uiLayer, player.x, player.y);
+    effect.explode(this.game, this.uiLayer, player.x, player.y);
     this.objectLayer.remove(player);
 
     if (player === this.player) {
