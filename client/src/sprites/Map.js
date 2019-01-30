@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import effect from './Shader';
 
 export default class extends Phaser.Sprite {
-  constructor ({ game, layer, blockWidth, blockHeight, numCols, numRows, blocks}) {
+  constructor ({ game, layer, shaders, blockWidth, blockHeight, numCols, numRows, blocks}) {
     super(game, 0, 0);
     this.graphicBlocks = []; // 1D array storing all blocks
     this.mapBlocks = []; // 2D array of int
@@ -35,8 +35,7 @@ export default class extends Phaser.Sprite {
           //graphic.drawRect(blockWidth * j, blockHeight * i, blockWidth, blockHeight);
           this.addChild(graphic);
 
-          this.glowFilter = new Phaser.Filter.Glow(game);
-          graphic.filters = [ this.glowFilter ];
+          graphic.filters = shaders;
 
           this.graphicBlocks.push(graphic);
           this.rectBlocks.push(
@@ -49,9 +48,10 @@ export default class extends Phaser.Sprite {
     }
 
     var boundary = new Phaser.Graphics(this.game, 0, 0);
-    boundary.lineStyle(2, 0x000000);
+    boundary.lineStyle(2, 0xFFFFFF);
     boundary.drawRect(0, 0, this.gameWidth, this.gameHeight);
     this.addChild(boundary);
+    boundary.filters = shaders;
 
     game.add.existing(this);
     layer.add(this);

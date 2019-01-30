@@ -16,6 +16,7 @@ export default class extends Phaser.State {
     this.load.image('player_particle', 'assets/images/particle/player_particle.png');
     this.load.image('explode_particle', 'assets/images/particle/explode_particle.png');
     this.load.image('explode_bullet', 'assets/images/particle/explode_bullet.png');
+    this.load.image('explode_hit', 'assets/images/particle/explode_hit.png');
   }
 
   create () {

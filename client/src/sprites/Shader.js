@@ -25,7 +25,7 @@ Phaser.Filter.Glow = function (game) {
               '} else {',
                   'factor = 2.0/abs(float(dist));',
               '}',
-              'sum += texture2D(uSampler, texcoord + vec2(xx, yy) * 0.002) * (abs(sin(time))+0.06);',
+              'sum += texture2D(uSampler, texcoord + vec2(xx, yy) * 0.002) * (0.2);',
           '}',
       '}',
       'gl_FragColor = sum * 0.025 + texture2D(uSampler, texcoord)*alpha;',

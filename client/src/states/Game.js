@@ -31,6 +31,8 @@ export default class extends Phaser.State {
     this.backgroundLayer = this.game.add.group();
     this.uiLayer = this.game.add.group();
     this.layerOrder = [this.backgroundLayer, this.objectLayer, this.uiLayer];
+    this.glowFilter = new Phaser.Filter.Glow(this.game);
+    this.shaders = [ this.glowFilter ];
 
     //  Our tiled scrolling background
     this.game.scale.pageAlignHorizontally = true;
@@ -180,18 +182,19 @@ export default class extends Phaser.State {
       player.shootManager.forEachAlive(bullet => {
         // Check if bullet is in Map
         if (!this.isInMap(bullet.position.x, bullet.position.y)) {
-          effect.explode_bullet(this.game, this.uiLayer, bullet.position.x, bullet.position.y);
+          effect.explode_bullet(this.game, this.uiLayer, this.shaders, bullet.position.x, bullet.position.y);
           bullet.kill();
         }
         // Check if bullet hit block
         if (this.isBulletHitBlock(bullet.position.x, bullet.position.y)) {
-          effect.explode_bullet(this.game, this.uiLayer, bullet.position.x, bullet.position.y);
+          effect.explode_bullet(this.game, this.uiLayer, this.shaders, bullet.position.x, bullet.position.y);
           bullet.kill();
         }
 
         // check if bullet hit enemies
         if (this.isBulletHitPlayers(player, this.playerList, bullet.position.x, bullet.position.y)) {
-          effect.explode_bullet(this.game, this.uiLayer, bullet.position.x, bullet.position.y);
+          effect.explode_bullet(this.game, this.uiLayer, this.shaders, bullet.position.x, bullet.position.y);
+          effect.explode_hit(this.game, this.uiLayer, this.shaders, bullet.position.x, bullet.position.y);
           bullet.kill();
         }
       })
@@ -311,6 +314,7 @@ export default class extends Phaser.State {
     var player = new Player({
       game: this.game,
       layer: this.objectLayer,
+      shaders: this.shaders,
       x: initPlayerMsg.getX(),
       y: initPlayerMsg.getY(),
       id: initPlayerMsg.getId(),
@@ -333,6 +337,7 @@ export default class extends Phaser.State {
     this.map = new Map({
       game: this.game,
       layer: this.backgroundLayer,
+      shaders: this.shaders,
       blockWidth: initMap.getBlockWidth(),
       blockHeight: initMap.getBlockHeight(),
       numCols: initMap.getNumCols(),
@@ -373,7 +378,7 @@ export default class extends Phaser.State {
     player.shootManager.destroy();
     player.emitter.destroy();
     // Exploding effect
-    effect.explode(this.game, this.uiLayer, player.x, player.y);
+    effect.explode(this.game, this.uiLayer, this.shaders, player.x, player.y);
     this.objectLayer.remove(player);
 
     if (player === this.player) {

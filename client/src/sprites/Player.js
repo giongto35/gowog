@@ -4,7 +4,7 @@ import config from '../config';
 import shader from './Shader';
 
 export default class extends Phaser.Sprite {
-  constructor ({ game, layer, id, name, x, y, asset }) {
+  constructor ({ game, layer, shaders, id, name, x, y, asset }) {
     super(game, x, y);
 
     this.id = id;
@@ -85,7 +85,8 @@ export default class extends Phaser.Sprite {
 
     // Add Neon effect to graphic only
     //this.glowFilter = new Phaser.Filter.Glow(game);
-    //this.graphic.filters = [ this.glowFilter ];
+    this.graphic.filters = shaders;
+    this.emitter.filters = shaders;
   }
 
   update () {
