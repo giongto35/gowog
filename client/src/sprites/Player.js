@@ -50,14 +50,14 @@ export default class extends Phaser.Sprite {
     game.add.existing(this);
 
     // Particle effects
-    this.emitter = game.add.emitter(this.x, this.y, 200);
+    this.emitter = game.add.emitter(this.x, this.y, 20);
     this.emitter.makeParticles('player_particle');
     this.emitter.gravity = 0;
     this.emitter.autoScale = false;
-    this.emitter.setScale(0.2, 0.1, 0.2, 0.1, 1500, Phaser.Easing.Linear.None)
+    this.emitter.setScale(0.2, 0.1, 0.2, 0.1, 1500, Phaser.Easing.Linear.None);
     this.emitter.setRotation(0.0, 0.0);
-    this.emitter.setAlpha(0.5, 0, 1500, Phaser.Easing.Linear.None, false);
-    this.emitter.start(false, 5000, 100);
+    this.emitter.setAlpha(0.8, 0.1, 1500, Phaser.Easing.Linear.None, false);
+    this.emitter.start(false, 1500, 100);
     layer.add(this.emitter);
 
     // Healthbar
