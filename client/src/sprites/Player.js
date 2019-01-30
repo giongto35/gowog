@@ -54,7 +54,7 @@ export default class extends Phaser.Sprite {
     this.emitter.makeParticles('player_particle');
     this.emitter.gravity = 0;
     this.emitter.autoScale = false;
-    this.emitter.setScale(0.2, 0.1, 0.2, 0.1, 1500, Phaser.Easing.Linear.None);
+    this.emitter.setScale(0.2, 0.0, 0.2, 0.0, 1500, Phaser.Easing.Linear.None);
     this.emitter.setRotation(0.0, 0.0);
     this.emitter.setAlpha(0.8, 0.1, 1500, Phaser.Easing.Linear.None, false);
     this.emitter.start(false, 1500, 100);
@@ -114,5 +114,13 @@ export default class extends Phaser.Sprite {
     // Params with both moveRight and moveDown, so we can know the direction player is facing
     // For this game, we don't need facing direction
     // TODO: Move animation here
+  }
+
+  isCollidePoint (x, y) {
+    return (this.dist(x, y, this.x, this.y) <= config.playerSize);
+  }
+
+  dist (x1, y1, x2, y2) {
+    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
   }
 }

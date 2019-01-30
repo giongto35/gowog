@@ -168,11 +168,11 @@ export default class extends Phaser.State {
 
     // Handle collision
     // Check bullet hit player
-    this.playerList.forEach(enemy => {
-      if (this.player && enemy !== this.player) {
-        this.game.physics.arcade.overlap(this.player.shootManager, enemy, this.bulletHitEnemy, null, this);
-      }
-    });
+    //this.playerList.forEach(enemy => {
+      //if (this.player && enemy !== this.player) {
+        //this.game.physics.arcade.overlap(this.player.shootManager, enemy, this.bulletHitEnemy, null, this);
+      //}
+    //});
 
     // Check bullet hit block
     this.playerList.forEach(player => {
@@ -188,16 +188,23 @@ export default class extends Phaser.State {
           effect.explode_bullet(this.game, this.uiLayer, bullet.position.x, bullet.position.y);
           bullet.kill();
         }
-      });
+
+        // check if bullet hit enemies
+        if (this.isBulletHitPlayers(player, this.playerList, bullet.position.x, bullet.position.y)) {
+          effect.explode_bullet(this.game, this.uiLayer, bullet.position.x, bullet.position.y);
+          bullet.kill();
+        }
+      })
+    });
 
       // Check if bullet hit any other players
-      this.playerList.forEach(enemy => {
-        if (enemy !== player) {
+      //this.playerList.forEach(enemy => {
+        //if (enemy !== player) {
           // game physics will check collision for all bullets in shootManager (check for the whole list)
-          this.game.physics.arcade.overlap(player.shootManager, enemy, this.bulletHitEnemy, null, this);
-        }
-      });
-    });
+          //this.game.physics.arcade.overlap(player.shootManager, enemy, this.bulletHitEnemy, null, this);
+        //}
+      //});
+    //});
 
     // Update scoreboard
     this.leaderboard.updateLeaderboard(this.playerList);
@@ -206,6 +213,15 @@ export default class extends Phaser.State {
     for (var i = 0; i < this.layerOrder.length; i++) {
       this.game.world.bringToTop(this.layerOrder[i]);
     }
+  }
+
+  isBulletHitPlayers (player, playerList, x, y) {
+    for (var enemy of playerList) {
+      if (enemy !== player && enemy.isCollidePoint(x, y)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   isBulletHitBlock (x, y) {
@@ -272,8 +288,13 @@ export default class extends Phaser.State {
     if (player === null) {
       return;
     }
-    player.x = playerMsg.getX();
-    player.y = playerMsg.getY();
+
+    if (player.x !== playerMsg.getX() || player.y !== playerMsg.getY()) {
+      player.x = playerMsg.getX();
+      player.y = playerMsg.getY();
+      // Move animation
+      player.move();
+    }
     player.health = playerMsg.getHealth();
     player.score = playerMsg.getScore();
   }
@@ -369,6 +390,9 @@ export default class extends Phaser.State {
   initShoot (initShootMsg) {
     var playerID = initShootMsg.getPlayerId();
     var player = this.getPlayerByID(playerID);
+    if (player === null) {
+      return;
+    }
     player.fire(
       initShootMsg.getX(),
       initShootMsg.getY(),
