@@ -6,8 +6,9 @@ const MapHeight = 200
 const ReloadTime = 100
 const RefreshRate = 1
 
-const PlayerWidth = 64
-const PlayerHeight = 64
+const PlayerSize = 32
+const PlayerWidth = 32
+const PlayerHeight = 32
 
 const ShootWidth = 20
 const ShootHeight = 20

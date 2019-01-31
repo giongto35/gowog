@@ -118,7 +118,7 @@ export default class extends Phaser.Sprite {
   }
 
   isCollidePoint (x, y) {
-    return (this.dist(x, y, this.x, this.y) <= config.playerSize);
+    return (this.dist(x, y, this.x, this.y) + 0.01 <= config.playerSize / 2);
   }
 
   dist (x1, y1, x2, y2) {

@@ -83,8 +83,6 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 			case <-quit:
 				ticker.Stop()
 				return
-
-			default:
 			}
 			log.Println("GAME PROCESS DONE")
 		}

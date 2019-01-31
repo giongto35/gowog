@@ -41,7 +41,7 @@ func NewPlayer(playerID int32, clientID int32, name string) Player {
 	playerProto.X = rand.Float32() * gameconst.BlockWidth * gameconst.MapWidth
 	playerProto.Y = rand.Float32() * gameconst.BlockHeight * gameconst.MapHeight
 
-	playerProto.Size = 30
+	playerProto.Size = gameconst.PlayerSize
 	playerProto.Health = 100
 	playerProto.CurrentInputNumber = 0
 
