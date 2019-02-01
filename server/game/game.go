@@ -67,7 +67,7 @@ func (g *gameImpl) gameUpdate() (quit chan bool) {
 
 			case v := <-g.newPlayerStream:
 				log.Println("New player with clientID", v)
-				g.newPlayerConnect(v.ClientID)
+				g.newPlayerConnect(v.Client)
 				log.Println("New player with clientID done", v)
 
 			case v := <-g.inputStream:
@@ -206,16 +206,21 @@ func (g *gameImpl) createInitAllMessage(players []playerpkg.Player, gameMap mapp
 
 // NewPlayerConnect is when new socket joins, we send all of the current player to it
 // Put it into Channel
-func (g *gameImpl) NewPlayerConnect(clientID int32) {
-	g.newPlayerStream <- common.NewPlayerEvent{ClientID: clientID}
+func (g *gameImpl) NewPlayerConnect(client ws.Client) {
+	g.newPlayerStream <- common.NewPlayerEvent{Client: client}
 }
 
 // newPlayerConnect is when new socket joins, we send all of the current player to it
-func (g *gameImpl) newPlayerConnect(clientID int32) {
+func (g *gameImpl) newPlayerConnect(client ws.Client) {
+	go client.WritePump()
+	go client.ReadPump()
+	time.Sleep(100)
+	clientID := client.GetID()
 	// Send all current players info to new player
 	initAllMsg := g.createInitAllMessage(g.objManager.GetPlayers(), g.objManager.GetMap())
 	encodedMsg, _ := proto.Marshal(initAllMsg)
 	log.Println(1, clientID)
+	// TODO: Hub might not finish registering client
 	g.hub.Send(clientID, encodedMsg)
 
 	// Send new player client ID

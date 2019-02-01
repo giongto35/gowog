@@ -121,21 +121,19 @@ func (c *clientImpl) GetID() int32 {
 }
 
 // NewClient returns new client given hub
-func NewClient(upgrader websocket.Upgrader, hub Hub, w http.ResponseWriter, r *http.Request) int32 {
+func NewClient(upgrader websocket.Upgrader, hub Hub, w http.ResponseWriter, r *http.Request) Client {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
-		return -1
+		return nil
 	}
 	// TODO: disconnect and reconnect cause deadlock
 	client := &clientImpl{id: rand.Int31(), hub: hub, conn: conn, send: make(chan []byte, gameconst.BufferSize)}
 	// We need to register client from hub.
-	client.hub.Register(client)
+	<-client.hub.Register(client)
 	//client.id = <-clientIDChan
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
-	go client.WritePump()
-	go client.ReadPump()
-	return client.id
+	return client
 }

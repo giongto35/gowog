@@ -1,5 +1,7 @@
 package common
 
+import	"github.com/giongto35/gowog/server/game/ws"
+
 // DestroyPlayerEvent is event sent from objManager to game master
 type DestroyPlayerEvent struct {
 	ClientID int32
@@ -8,7 +10,7 @@ type DestroyPlayerEvent struct {
 
 // NewPlayerEvent is event sent from objManager to game master
 type NewPlayerEvent struct {
-	ClientID int32
+	Client ws.Client
 }
 
 // ProcessInputEvent is game input event sent from objManager to game master

@@ -14,7 +14,7 @@ type Client interface {
 type Hub interface {
 	Run()
 	UnRegister(c Client)
-	Register(c Client)
+	Register(c Client) chan bool
 	ReceiveMessage(b []byte)
 	Broadcast(b []byte)
 	BroadcastExclude(b []byte, id int32)

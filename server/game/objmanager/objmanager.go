@@ -154,7 +154,7 @@ func (m *objManager) Update() {
 				// Remove player if health is under 0
 				if player.GetHealth() <= 0 {
 					log.Println("Push remove Player Event to event stream")
-					// TODO: Removeplayer here, don't need send
+					// TODO: Removeplayer here, don't need push to event stream
 					m.game.RemovePlayer(player.GetID(), -1)
 					// Add score for player who shoots
 					if player, ok := m.GetPlayerByID(shoot.GetPlayerID()); ok {

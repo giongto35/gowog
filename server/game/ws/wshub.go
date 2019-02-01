@@ -41,6 +41,7 @@ type broadcastMessage struct {
 
 type registerClientEvent struct {
 	client Client
+	done chan bool
 }
 
 func NewHub() Hub {
@@ -66,6 +67,7 @@ func (h *hubImpl) Run() {
 			log.Println("HUB register", register.client.GetID())
 			client := register.client
 			h.clients[client.GetID()] = client
+			register.done <- true
 			log.Println("HUB register done")
 
 		case client := <-h.unregister:
@@ -101,11 +103,7 @@ func (h *hubImpl) Run() {
 			log.Println("Sending single message to ", serverMessage.clientID)
 			if client, ok := h.clients[serverMessage.clientID]; ok {
 				fmt.Println("NUM CLIENTS", len(h.clients))
-				select {
-				case client.GetSend() <- serverMessage.msg:
-					//default:
-					//log.Println("Sended to close channel", client)
-				}
+				client.GetSend() <- serverMessage.msg
 			}
 			log.Println("Sending single message to ", serverMessage.clientID, " done")
 		}
@@ -113,9 +111,11 @@ func (h *hubImpl) Run() {
 	}
 }
 
-func (h *hubImpl) Register(c Client) {
+func (h *hubImpl) Register(c Client) chan bool {
+	done := make(chan bool)
 	// This clientIDchan is the channel for client to receive clientID after initilized
-	h.register <- registerClientEvent{client: c}
+	h.register <- registerClientEvent{client: c, done:done}
+	return done
 }
 
 func (h *hubImpl) UnRegister(c Client) {

@@ -18,4 +18,4 @@ const BlockWidth = 64
 const BlockHeight = 64
 
 // Settings
-var BufferSize = 50
+var BufferSize = 200
