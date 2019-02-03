@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -81,20 +80,20 @@ func (c *clientImpl) WritePump() {
 			if !ok {
 				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
-				fmt.Println("Write pump closed", c.GetID())
+				log.Println("Write pump closed", c.GetID())
 				return
 			}
 
 			w, err := c.conn.NextWriter(websocket.BinaryMessage)
 			if err != nil {
-				fmt.Println("Write pump closed ", c.GetID(), err)
+				log.Println("Write pump closed ", c.GetID(), err)
 				return
 			}
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
 			if err := w.Close(); err != nil {
-				fmt.Println("Write pump cannot closed", c.GetID(), err)
+				log.Println("Write pump cannot closed", c.GetID(), err)
 				return
 			}
 		}

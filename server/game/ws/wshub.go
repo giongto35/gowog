@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/giongto35/gowog/server/game/gameconst"
@@ -41,7 +40,7 @@ type broadcastMessage struct {
 
 type registerClientEvent struct {
 	client Client
-	done chan bool
+	done   chan bool
 }
 
 func NewHub() Hub {
@@ -102,7 +101,7 @@ func (h *hubImpl) Run() {
 			// Sending single message exclude serverMessage.clientID
 			log.Println("Sending single message to ", serverMessage.clientID)
 			if client, ok := h.clients[serverMessage.clientID]; ok {
-				fmt.Println("NUM CLIENTS", len(h.clients))
+				log.Println("NUM CLIENTS", len(h.clients))
 				client.GetSend() <- serverMessage.msg
 			}
 			log.Println("Sending single message to ", serverMessage.clientID, " done")
@@ -114,7 +113,7 @@ func (h *hubImpl) Run() {
 func (h *hubImpl) Register(c Client) chan bool {
 	done := make(chan bool)
 	// This clientIDchan is the channel for client to receive clientID after initilized
-	h.register <- registerClientEvent{client: c, done:done}
+	h.register <- registerClientEvent{client: c, done: done}
 	return done
 }
 

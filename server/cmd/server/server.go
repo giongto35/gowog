@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"runtime"
 
 	"github.com/giongto35/gowog/server/game"
@@ -15,6 +16,7 @@ import (
 )
 
 var addr = flag.String("addr", "0.0.0.0:8080", "http service address")
+var logfile = flag.String("logfile", "", "Log file")
 var cpuprofile = flag.Bool("cpuprofile", false, "Enable CPUProfile")
 var memprofile = flag.Bool("memprofile", false, "Enable MemProfile")
 var disablelog = flag.Bool("disablelog", false, "Disable log")
@@ -39,23 +41,34 @@ func main() {
 	}
 	// CPU profile
 	if *cpuprofile {
-		fmt.Println("Profiling CPU")
+		log.Println("Profiling CPU")
 		defer profile.Start().Stop()
 	}
 	// Memory profile
 	if *memprofile {
-		fmt.Println("Profiling MemProfile")
+		log.Println("Profiling MemProfile")
 		defer profile.Start(profile.MemProfile).Stop()
 	}
 
 	// If there is clientBuild flag, we return the client build for index
 	if *clientBuild != "" {
-		fmt.Println("loading file from ", *clientBuild)
+		log.Println("loading file from ", *clientBuild)
 		http.Handle("/", http.FileServer(http.Dir(*clientBuild)))
 
 	}
 
-	// HTTP setup
+	// Log to file
+	if *logfile != "" {
+		log.Println("Write to logfile", *logfile)
+		f, err := os.OpenFile(*logfile, os.O_RDWR|os.O_CREATE, 0666)
+		if err != nil {
+			log.Fatalf("error opening file: %v", err)
+		}
+
+		log.SetOutput(f)
+		defer f.Close() // HTTP setup
+	}
+
 	upgrader.CheckOrigin = func(r *http.Request) bool {
 		return true
 	}

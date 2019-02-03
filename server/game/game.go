@@ -4,7 +4,6 @@ package game
 // For each event it received, it will do game logic and sending message to other.
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"runtime"
@@ -154,7 +153,9 @@ func (g *gameImpl) processInput(message []byte) {
 			break
 		}
 
+		log.Println("Before position x, y", player.GetPosition().X, player.GetPosition().Y)
 		g.objManager.MovePlayer(player, msg.GetMovePositionPayload().GetDx(), msg.GetMovePositionPayload().GetDy(), gameconst.PlayerSpeed, msg.GetTimeElapsed())
+		log.Println("After position", player.GetPosition().X, player.GetPosition().Y)
 		// Update sequence number
 		player.SetCurrentInputNumber(msg.InputSequenceNumber)
 
@@ -234,7 +235,6 @@ func (g *gameImpl) newPlayerConnect(client ws.Client) {
 	encodedMsg, _ = proto.Marshal(registerClientIDMsg)
 	log.Println(2, clientID)
 	g.hub.Send(clientID, encodedMsg)
-	log.Println("Done send 2")
 }
 
 // sendShootMsg send shoot event to all clients
@@ -274,15 +274,12 @@ func (g *gameImpl) initPlayer(clientID int32, name string) {
 		},
 	}
 	encodedMsg, _ := proto.Marshal(initPlayerMsg)
-	fmt.Println("0")
 	g.hub.Send(clientID, encodedMsg)
 
 	// Send all other players about new player info
 	initPlayerMsg.GetInitPlayerPayload().IsMain = false
 	encodedMsg, _ = proto.Marshal(initPlayerMsg)
-	fmt.Println("broadcast 0.5")
 	g.hub.BroadcastExclude(encodedMsg, clientID)
-	fmt.Println("Done broadcast 0.5")
 }
 
 //  removePlayer remove player logic from game using player ID
@@ -318,12 +315,12 @@ func (g *gameImpl) RemovePlayer(playerID int32, clientID int32) {
 // It only touch gamelogic, not the clients
 func (g *gameImpl) RemovePlayerByClientID(clientID int32) {
 	// TODO: Might block here, use eventStream for corresponding events
-	fmt.Println("Game Remove player ClientID sent ", clientID, len(g.destroyPlayerStream), g.destroyPlayerStream)
+	log.Println("Game Remove player ClientID sent ", clientID, len(g.destroyPlayerStream), g.destroyPlayerStream)
 	g.destroyPlayerStream <- common.DestroyPlayerEvent{
 		ClientID: clientID,
 		PlayerID: -1,
 	}
-	fmt.Println("Game Remove player ClientID done ", clientID)
+	log.Println("Game Remove player ClientID done ", clientID)
 }
 
 // GetQuitChannel returns Quit channel for the outside
