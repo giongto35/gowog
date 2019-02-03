@@ -19,3 +19,5 @@ const BlockHeight = 64
 
 // Settings
 var BufferSize = 200
+
+var PathFindAIObjective = false

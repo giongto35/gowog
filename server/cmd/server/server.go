@@ -10,6 +10,7 @@ import (
 	"runtime"
 
 	"github.com/giongto35/gowog/server/game"
+	"github.com/giongto35/gowog/server/game/gameconst"
 	"github.com/giongto35/gowog/server/game/ws"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/profile"
@@ -21,6 +22,7 @@ var cpuprofile = flag.Bool("cpuprofile", false, "Enable CPUProfile")
 var memprofile = flag.Bool("memprofile", false, "Enable MemProfile")
 var disablelog = flag.Bool("disablelog", false, "Disable log")
 var clientBuild = flag.String("prod", "", "is production")
+var pathFindAIObjective = flag.Bool("pathFind", false, "Enable Path Find AI")
 
 var upgrader = websocket.Upgrader{} // use default options
 var hub = ws.NewHub()
@@ -67,6 +69,10 @@ func main() {
 
 		log.SetOutput(f)
 		defer f.Close() // HTTP setup
+	}
+
+	if *pathFindAIObjective == true {
+		gameconst.PathFindAIObjective = *pathFindAIObjective
 	}
 
 	upgrader.CheckOrigin = func(r *http.Request) bool {

@@ -1,6 +1,6 @@
 package common
 
-import	"github.com/giongto35/gowog/server/game/ws"
+import "github.com/giongto35/gowog/server/game/ws"
 
 // DestroyPlayerEvent is event sent from objManager to game master
 type DestroyPlayerEvent struct {
@@ -16,4 +16,10 @@ type NewPlayerEvent struct {
 // ProcessInputEvent is game input event sent from objManager to game master
 type ProcessInputEvent struct {
 	Message []byte
+}
+
+// Point has X and Y expressing object location
+type Point struct {
+	X float32
+	Y float32
 }

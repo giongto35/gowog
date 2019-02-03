@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/giongto35/gowog/server/Message_proto"
+	"github.com/giongto35/gowog/server/game/common"
 	"github.com/giongto35/gowog/server/game/gameconst"
 	"github.com/giongto35/gowog/server/game/shape"
 	"github.com/golang/protobuf/ptypes"
@@ -75,9 +76,15 @@ func (p *PlayerImpl) GetPlayerProto() *Message_proto.Player {
 	return p.player
 }
 
-// GetPlayerProto ...
-func (p *PlayerImpl) GetPosition() Position {
-	return Position{X: p.player.GetX(), Y: p.player.GetY()}
+// GetPosition ...
+func (p *PlayerImpl) GetPosition() common.Point {
+	return common.Point{X: p.player.GetX(), Y: p.player.GetY()}
+}
+
+// SetPosition ...
+func (p *PlayerImpl) SetPosition(point common.Point) {
+	p.player.X = point.X
+	p.player.Y = point.Y
 }
 
 // GetName ...

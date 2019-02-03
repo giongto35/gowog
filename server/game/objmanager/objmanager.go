@@ -1,6 +1,7 @@
 package objmanager
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"time"
@@ -45,10 +46,17 @@ func (m *objManager) RegisterPlayer(clientID int32, name string) playerpkg.Playe
 	// Keep generate player until it not collide with gameMap
 	// TODO: check first and assign
 	var tempPlayer playerpkg.Player
-	for {
+	// If game objective is path finding, set the start position to map startPoint
+	if gameconst.PathFindAIObjective {
+		fmt.Println(" Start Point ", m.gameMap.GetStartPoint())
 		tempPlayer = playerpkg.NewPlayer(playerID, clientID, name)
-		if m.IsValidPosition(tempPlayer.GetCircle()) {
-			break
+		tempPlayer.SetPosition(m.gameMap.GetStartPoint())
+	} else {
+		for {
+			tempPlayer = playerpkg.NewPlayer(playerID, clientID, name)
+			if m.IsValidPosition(tempPlayer.GetCircle()) {
+				break
+			}
 		}
 	}
 	// Assign tempPlayer to player
