@@ -2672,9 +2672,10 @@ proto.Message_proto.Player.toObject = function(includeInstance, msg) {
     level: jspb.Message.getFieldWithDefault(msg, 6, 0),
     score: jspb.Message.getFieldWithDefault(msg, 7, 0),
     name: jspb.Message.getFieldWithDefault(msg, 8, ""),
+    aiReward: +jspb.Message.getFieldWithDefault(msg, 9, 0.0),
     nextReload: (f = msg.getNextReload()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    isDestroy: jspb.Message.getFieldWithDefault(msg, 10, false),
-    currentInputNumber: jspb.Message.getFieldWithDefault(msg, 11, 0)
+    isDestroy: jspb.Message.getFieldWithDefault(msg, 11, false),
+    currentInputNumber: jspb.Message.getFieldWithDefault(msg, 12, 0)
   };
 
   if (includeInstance) {
@@ -2744,15 +2745,19 @@ proto.Message_proto.Player.deserializeBinaryFromReader = function(msg, reader) {
       msg.setName(value);
       break;
     case 9:
+      var value = /** @type {number} */ (reader.readFloat());
+      msg.setAiReward(value);
+      break;
+    case 10:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setNextReload(value);
       break;
-    case 10:
+    case 11:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setIsDestroy(value);
       break;
-    case 11:
+    case 12:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setCurrentInputNumber(value);
       break;
@@ -2841,10 +2846,17 @@ proto.Message_proto.Player.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getAiReward();
+  if (f !== 0.0) {
+    writer.writeFloat(
+      9,
+      f
+    );
+  }
   f = message.getNextReload();
   if (f != null) {
     writer.writeMessage(
-      9,
+      10,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
@@ -2852,14 +2864,14 @@ proto.Message_proto.Player.serializeBinaryToWriter = function(message, writer) {
   f = message.getIsDestroy();
   if (f) {
     writer.writeBool(
-      10,
+      11,
       f
     );
   }
   f = message.getCurrentInputNumber();
   if (f !== 0) {
     writer.writeInt32(
-      11,
+      12,
       f
     );
   }
@@ -2987,18 +2999,33 @@ proto.Message_proto.Player.prototype.setName = function(value) {
 
 
 /**
- * optional google.protobuf.Timestamp next_reload = 9;
+ * optional float ai_reward = 9;
+ * @return {number}
+ */
+proto.Message_proto.Player.prototype.getAiReward = function() {
+  return /** @type {number} */ (+jspb.Message.getFieldWithDefault(this, 9, 0.0));
+};
+
+
+/** @param {number} value */
+proto.Message_proto.Player.prototype.setAiReward = function(value) {
+  jspb.Message.setProto3FloatField(this, 9, value);
+};
+
+
+/**
+ * optional google.protobuf.Timestamp next_reload = 10;
  * @return {?proto.google.protobuf.Timestamp}
  */
 proto.Message_proto.Player.prototype.getNextReload = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 9));
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 10));
 };
 
 
 /** @param {?proto.google.protobuf.Timestamp|undefined} value */
 proto.Message_proto.Player.prototype.setNextReload = function(value) {
-  jspb.Message.setWrapperField(this, 9, value);
+  jspb.Message.setWrapperField(this, 10, value);
 };
 
 
@@ -3012,39 +3039,39 @@ proto.Message_proto.Player.prototype.clearNextReload = function() {
  * @return {!boolean}
  */
 proto.Message_proto.Player.prototype.hasNextReload = function() {
-  return jspb.Message.getField(this, 9) != null;
+  return jspb.Message.getField(this, 10) != null;
 };
 
 
 /**
- * optional bool is_destroy = 10;
+ * optional bool is_destroy = 11;
  * Note that Boolean fields may be set to 0/1 when serialized from a Java server.
  * You should avoid comparisons like {@code val === true/false} in those cases.
  * @return {boolean}
  */
 proto.Message_proto.Player.prototype.getIsDestroy = function() {
-  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 10, false));
+  return /** @type {boolean} */ (jspb.Message.getFieldWithDefault(this, 11, false));
 };
 
 
 /** @param {boolean} value */
 proto.Message_proto.Player.prototype.setIsDestroy = function(value) {
-  jspb.Message.setProto3BooleanField(this, 10, value);
+  jspb.Message.setProto3BooleanField(this, 11, value);
 };
 
 
 /**
- * optional int32 current_input_number = 11;
+ * optional int32 current_input_number = 12;
  * @return {number}
  */
 proto.Message_proto.Player.prototype.getCurrentInputNumber = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 11, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 12, 0));
 };
 
 
 /** @param {number} value */
 proto.Message_proto.Player.prototype.setCurrentInputNumber = function(value) {
-  jspb.Message.setProto3IntField(this, 11, value);
+  jspb.Message.setProto3IntField(this, 12, value);
 };
 
 

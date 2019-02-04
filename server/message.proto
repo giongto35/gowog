@@ -99,9 +99,10 @@ message Player {
 	int32 level = 6;
 	int32 score = 7;
 	string name = 8;
-	google.protobuf.Timestamp next_reload = 9;
-	bool is_destroy = 10;
-	int32 current_input_number = 11;
+        float ai_reward = 9;  
+	google.protobuf.Timestamp next_reload = 10;
+	bool is_destroy = 11;
+	int32 current_input_number = 12;
 }
 
 message ServerGameMessage {

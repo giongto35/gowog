@@ -23,6 +23,7 @@ type Player interface {
 	SetHealth(health float32)
 	GetHealth() float32
 	AddScore()
+	SetReward(r float32)
 
 	IsEnable() bool
 	SetEnable(enable bool)

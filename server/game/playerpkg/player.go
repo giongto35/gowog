@@ -1,6 +1,7 @@
 package playerpkg
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -172,4 +173,10 @@ func (p *PlayerImpl) GetRect() shape.Rect {
 		X2: p.player.GetX() + p.player.GetSize()/2,
 		Y2: p.player.GetY() + p.player.GetSize()/2,
 	}
+}
+
+// SetReward set reward for player (Use for AI agent)
+func (p *PlayerImpl) SetReward(r float32) {
+	fmt.Println("Set reward", r)
+	p.player.AiReward = r
 }
