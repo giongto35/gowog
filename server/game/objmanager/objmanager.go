@@ -186,7 +186,7 @@ func (m *objManager) Update() {
 
 	for _, player := range m.players {
 		// Add AI Reward for path finding = dist to end(For ai agent)
-		player.SetReward(m.dist(player.GetPosition().X, player.GetPosition().Y, m.gameMap.GetEndPoint().X, m.gameMap.GetEndPoint().Y))
+		player.SetReward(1 / m.dist(player.GetPosition().X, player.GetPosition().Y, m.gameMap.GetEndPoint().X, m.gameMap.GetEndPoint().Y))
 	}
 }
 
