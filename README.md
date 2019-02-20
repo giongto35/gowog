@@ -95,16 +95,6 @@ The gameplay is mainly for demonstration purpose. My goal is to keep the game si
 
 However, I'm still open to Graphic improvement and client codebase refactor. I would love to see some particles burst or glow, motion effects. Remember that different people have different perspective on how the game should look, so we need full consensus before making ui change.
 
-#### Why the game only runs on single core?
-
-The game indeed can run well on multi-core parallelly. After some comparision, running on multi-core showed the slower performance due to high channel and lock contention.
-
-We need a better design to reduce context switch and contention.
-
-#### If the game runs on single core, why needs to you channel? Why don't fully go with NodeJS for server and callback model?
-
-Remember, concurrency is not parallelism. Context switch can happen everytime. GoRoutine and GoChannel is very elegant solution to deal with concurrency. And it's easier and more intuitive than with Callback model (a.k.a Callback hell).
-
 #### Why protobuf?
 
 To optimize package size, we need to compress it into binary. Protobuf offers fast language-neutral serialization and deserilization, so Golang server can communicate with JS client in an optimal way.
