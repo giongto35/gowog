@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import Shoot from './Shoot';
 import config from '../config';
-import shader from './Shader';
+//import shader from './Shader';
 
 export default class extends Phaser.Sprite {
   constructor ({ game, layer, shaders, id, name, x, y, asset }) {
@@ -78,15 +78,13 @@ export default class extends Phaser.Sprite {
     this.addChild(this.nametag);
     this.nametag.bringToTop();
 
-    // this.turret.scale.setTo(game.scaleRatio, game.scaleRatio);
     this.game.physics.enable(this, Phaser.Physics.ARCADE);
 
     layer.add(this);
 
     // Add Neon effect to graphic only
-    //this.glowFilter = new Phaser.Filter.Glow(game);
-    this.graphic.filters = shaders;
-    this.emitter.filters = shaders;
+    //this.graphic.filters = shaders;
+    //this.emitter.filters = shaders;
   }
 
   update () {

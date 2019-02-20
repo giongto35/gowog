@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-export function explode (game, layer, shaders, x, y) {
+export function explode (game, layer, x, y) {
   var emitter = game.add.emitter(x, y, 200);
   emitter.makeParticles('explode_particle');
   emitter.gravity = 0;
@@ -14,7 +14,7 @@ export function explode (game, layer, shaders, x, y) {
   game.time.events.add(200, function () { emitter.destroy(); }, this);
 }
 
-export function explode_bullet (game, layer, shaders, x, y) {
+export function explode_bullet (game, layer, x, y) {
   var emitter = game.add.emitter(x, y, 40);
   emitter.makeParticles('explode_bullet');
   emitter.gravity = 0;
@@ -28,7 +28,7 @@ export function explode_bullet (game, layer, shaders, x, y) {
   game.time.events.add(200, function () { emitter.destroy(); }, this);
 }
 
-export function explode_hit (game, layer, shaders, x, y) {
+export function explode_hit (game, layer, x, y) {
   var emitter = game.add.emitter(x, y, 60);
   emitter.makeParticles('explode_hit');
   emitter.gravity = 0;

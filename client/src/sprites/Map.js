@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import effect from './Shader';
+//import effect from './Shader';
 
 export default class extends Phaser.Sprite {
   constructor ({ game, layer, shaders, blockWidth, blockHeight, numCols, numRows, blocks}) {
@@ -29,13 +29,9 @@ export default class extends Phaser.Sprite {
           graphic.x = blockWidth * j
           graphic.y = blockWidth * i
 
-          //var graphic = new Phaser.Graphics(game, 0, 0);
-          //graphic.lineStyle(2, 0x000000);
-          //graphic.beginFill(0xFF0000, 1);
-          //graphic.drawRect(blockWidth * j, blockHeight * i, blockWidth, blockHeight);
           this.addChild(graphic);
 
-          graphic.filters = shaders;
+          //graphic.filters = shaders;
 
           this.graphicBlocks.push(graphic);
           this.rectBlocks.push(
@@ -51,7 +47,7 @@ export default class extends Phaser.Sprite {
     boundary.lineStyle(2, 0xFFFFFF);
     boundary.drawRect(0, 0, this.gameWidth, this.gameHeight);
     this.addChild(boundary);
-    boundary.filters = shaders;
+    //boundary.filters = shaders;
 
     game.add.existing(this);
     layer.add(this);

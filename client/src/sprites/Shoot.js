@@ -16,7 +16,6 @@ export default class extends Phaser.Group {
     this.setAll('checkWorldBounds', true);
     game.add.existing(this);
     layer.add(this);
-    // this.scale.setTo(game.scaleRatio, game.scaleRatio);
   }
 
   update () {
