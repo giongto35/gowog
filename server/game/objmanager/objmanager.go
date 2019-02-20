@@ -273,6 +273,10 @@ func (m *objManager) MovePlayer(player playerpkg.Player, dx float32, dy float32,
 	}
 }
 
+func (m *objManager) SetPlayerPosition(player playerpkg.Player, x float32, y float32) {
+	player.SetPosition(common.Point{X: x, Y: y})
+}
+
 // RemovePlayerByClientID remove player with clientID. We need this because when a client disconnected, hub notified objManager with clientID
 // We don't delete player here because this function is called from game master
 //func (m *objManager) RemovePlayerByClientID(clientID int32) {

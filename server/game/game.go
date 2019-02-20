@@ -175,6 +175,19 @@ func (g *gameImpl) processInput(message []byte) {
 	case *Message_proto.ClientGameMessage_InitPlayerPayload:
 		log.Println("Received Init Player Message", msg.GetInitPlayerPayload())
 		g.initPlayer(msg.GetInitPlayerPayload().GetClientId(), msg.GetInitPlayerPayload().GetName())
+
+	case *Message_proto.ClientGameMessage_SetPositionPayload:
+		log.Println("Received Set Position Message", msg)
+		// Set position player game logic
+		player, ok := g.objManager.GetPlayerByID(msg.GetSetPositionPayload().GetId())
+		if !ok {
+			break
+		}
+
+		g.objManager.SetPlayerPosition(player, msg.GetSetPositionPayload().GetX(), msg.GetSetPositionPayload().GetY())
+		// Update sequence number
+		player.SetCurrentInputNumber(msg.InputSequenceNumber)
+
 	}
 }
 
