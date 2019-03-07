@@ -14,7 +14,11 @@ US West region (California)
 
 http://us.game.giongto35.com
 
-**Note**: Please select the region closest to you to experience better game experience.
+**Note**: Please select the region closest to you to have the best gaming experience.
+
+## AI Experiment on the Agent
+
+https://www.youtube.com/watch?v=pWbb1m91mhU
 
 ### Local
 
