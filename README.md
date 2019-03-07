@@ -18,6 +18,8 @@ http://us.game.giongto35.com
 
 ### AI Experiment on the Agent
 
+As the server, client and messages are decoupled, it is easy to communicate with backend. Below is my AI agent written in Python that learns to interact with environment.
+
 https://www.youtube.com/watch?v=pWbb1m91mhU
 
 ### Local
