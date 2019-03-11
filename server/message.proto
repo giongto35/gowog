@@ -12,6 +12,7 @@ message ClientGameMessage {
 		Shoot shoot_payload = 5;
 		BuildWall build_wall_payload = 6;
 		UpdatePlayer update_player_payload = 7;
+		SetPosition set_position_payload = 8;
 	}
 }
 
@@ -24,6 +25,12 @@ enum Direction {
 	DOWN = 1;
 	LEFT = 2;
 	RIGHT = 3;
+}
+
+message SetPosition {
+	int32 id = 1;
+	float x = 2;
+	float y = 3;
 }
 
 message MovePosition {

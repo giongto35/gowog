@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/giongto35/gowog/server/Message_proto"
+	"github.com/giongto35/gowog/server/game/common"
 	"github.com/giongto35/gowog/server/game/shape"
 )
 
@@ -13,7 +14,8 @@ type Player interface {
 
 	GetPlayerProto() *Message_proto.Player
 
-	GetPosition() Position
+	GetPosition() common.Point
+	SetPosition(common.Point)
 	GetName() string
 	GetID() int32
 	GetClientID() int32

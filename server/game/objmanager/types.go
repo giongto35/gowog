@@ -17,6 +17,7 @@ type ObjectManager interface {
 	GetMap() mappkg.Map
 	GetPlayerByID(id int32) (playerpkg.Player, bool)
 	MovePlayer(player playerpkg.Player, dx float32, dy float32, speed float32, timeElapsed float32)
+	SetPlayerPosition(player playerpkg.Player, x float32, y float32)
 
 	Update()
 }
