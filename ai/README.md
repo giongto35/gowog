@@ -17,12 +17,11 @@ save_fie_name is where the weights is saved. The next time, if we specify the ex
 ## Genetic Algorithm
 
 ### Agent
+_Implementation at cs2denv__ga.py_
 
-`cs2denv_ga.py`
+CS2D Agent is built on CS2D following openAI agent. It supports the fundamental methods of OpenAI Agent including : reset(), step()  
 
-CS2D Agent is built on CS2D following openAI agent. It supports the fundamental methods of OpenAI Agent including : reset(), step()
-
-The ObservationSpace is 1D array constructed from the update_player message from server
+The ObservationSpace is 1D array constructed from the update_player message from server  
 1. Player position, player size, number of columns, number of rows, block width, block height
 2. The nearest block to the left, right, up, down
 3. The player position in the binary block map. The map is a 2D array of 0, 1 when 0 is empty and 1 is block.
@@ -31,8 +30,9 @@ The ObservationSpace is 1D array constructed from the update_player message from
 The Reward is the 1 / distance to the goal. If the agent is close to the goal by 100, the reward is 1 and the episode finishes.
 
 ### NeuroEvolution
+_Implementation at train_ga.py__  
 
-NeuroEvolution is an AI that uses evolutionary algorithms to generate artificial neural network. For each iteration (generation), the program will generate a new set of neural network weights based on the best settings in the previous iteration. The process of generating a NN from previous NN called *Mutate*, which added a random noise to each params in the NN.
+NeuroEvolution is an AI that uses evolutionary algorithms to generate artificial neural network. For each iteration (generation), the program will generate a new set of neural network weights based on the best settings in the previous iteration. The process of generating a NN from previous NN called *Mutate*, which added a random noise to each params in the NN.  
 
 One special enhancement is that instead of storing all weights of a generation, we store only list of the noise seeds applied to the neural network. Because under the same seed, all the randomization is the same, so a seed can represent a mutation operator of a network. Instead of keeping all the weights of a generation, we can just store a set of seeds from begin to the current generation, and re-construct the weights from that set to get the weights of all the neural networks.
 
