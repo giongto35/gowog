@@ -17,7 +17,7 @@ save_fie_name is where the weights is saved. The next time, if we specify the ex
 ## Genetic Algorithm
 
 ### Agent
-_Implementation at cs2denv__ga.py_
+_Implementation at cs2denv_ga.py_
 
 CS2D Agent is built on CS2D following openAI agent. It supports the fundamental methods of OpenAI Agent including : reset(), step()  
 
@@ -30,7 +30,7 @@ The ObservationSpace is 1D array constructed from the update_player message from
 The Reward is the 1 / distance to the goal. If the agent is close to the goal by 100, the reward is 1 and the episode finishes.
 
 ### NeuroEvolution
-_Implementation at train_ga.py__  
+_Implementation at train_ga.py_
 
 NeuroEvolution is an AI that uses evolutionary algorithms to generate artificial neural network. For each iteration (generation), the program will generate a new set of neural network weights based on the best settings in the previous iteration. The process of generating a NN from previous NN called *Mutate*, which added a random noise to each params in the NN.  
 

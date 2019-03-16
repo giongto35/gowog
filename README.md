@@ -22,7 +22,7 @@ As the server, client and messages are decoupled, it is easy to communicate with
 
 https://www.youtube.com/watch?v=pWbb1m91mhU
 
-The implementation is at **[**gowog/ai**](gowog/ai)
+The implementation is at [ai](gowog/ai)
 
 ### Local
 
