@@ -1,0 +1,6 @@
+numpy==1.15.4
+protobuf==3.6.1
+requests==2.21.0
+torch==0.4.1
+torchvision==0.2.1
+websocket-client==0.54.0

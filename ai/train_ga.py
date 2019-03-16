@@ -5,7 +5,6 @@ https://github.com/PacktPublishing/Deep-Reinforcement-Learning-Hands-On/blob/mas
 #!/usr/bin/env python3
 import os
 import sys
-import gym
 import argparse
 import collections
 import copy

@@ -3,7 +3,7 @@ AI Environment for CS2D following OPEN AI Environment style:
   env.step((x, y)): Move the agent (x, y).
   env.reset(): Reset the environment and return the observartion in formatted 1D array.
   env.observation_space.shape: Return the shape of observation.
-  env.action_space.n: Return the 
+  env.action_space.n: Return the shape of action
 """
 
 from websocket import create_connection
