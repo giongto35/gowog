@@ -1,3 +1,11 @@
+"""
+AI Environment for CS2D following OPEN AI Environment style:
+  env.step((x, y)): Move the agent (x, y).
+  env.reset(): Reset the environment and return the observartion in formatted 1D array.
+  env.observation_space.shape: Return the shape of observation.
+  env.action_space.n: Return the 
+"""
+
 from websocket import create_connection
 import random
 import math
@@ -32,7 +40,7 @@ class CS2DEnvironment:
         if env == LOCAL_ENV:
             wshost = 'ws://localhost:8080/game/'
         else:
-            wshost = 'ws://35.198.245.53/game/'
+            wshost = ''# Not allowed yet
 
         self.name = name
         self.wshost = wshost
@@ -43,12 +51,19 @@ class CS2DEnvironment:
         self.objective = OBJECTIVE_NOT_COLLIDE
 
     def step(self, d):
+        """
+        Return observation, reward, done, None
+
+        Move agent in the direction of d[0], d[1]
+        """
         dx, dy = d[0], d[1]
         obs, reward, done = self.move_position(dx, dy)
         return obs, reward, done, None
 
     def init_player(self, name, client_id):
         self.current_input_number += 1
+
+        # Construct init player message
         message = messagepb.ClientGameMessage()
 
         init_player = messagepb.InitPlayer()
@@ -60,6 +75,7 @@ class CS2DEnvironment:
         self.ws.send(message.SerializeToString())
 
     def set_position(self, x, y):
+        # Construct set_position message
         message = messagepb.ClientGameMessage()
 
         set_position = messagepb.SetPosition()
@@ -71,10 +87,14 @@ class CS2DEnvironment:
 
         self.ws.send(message.SerializeToString())
 
+        # Update agent position also
         self.player.x = x
         self.player.y = y
 
     def move_position(self, dx, dy):
+        """
+        Move position toward (dx, dy)
+        """
         self.num_steps += 1
         self.current_input_number += 1
         message = messagepb.ClientGameMessage()
@@ -89,56 +109,50 @@ class CS2DEnvironment:
         message.input_sequence_number = self.current_input_number
 
         self.ws.send(message.SerializeToString())
+
+        # The for loop to receive the response from server
         while True:
-            # Set timeout
             binary_res = self.ws.recv()
             # Received client accepted from server with client_id
             serverMsg = messagepb.ServerGameMessage()
             serverMsg.ParseFromString(binary_res)
 
+            # If received remove message then remove the agent
             if serverMsg.HasField("remove_player_payload") == True:
                 remove_player_msg = serverMsg.remove_player_payload
                 if self.player.id == remove_player_msg.id:
                     obs = self.__get_obs()
                     return obs, 0, True
 
+            # If received update player message
             if serverMsg.HasField("update_player_payload") == True:
                 update_player_msg = serverMsg.update_player_payload
                 last_process_input = update_player_msg.current_input_number
+                # Need to ensure the update_player_msg comes from the same agent.
+                # The message is also up-to-date with the current_input_number of message
+                # match agent current input number
 
                 if self.player.id == update_player_msg.id \
                         and last_process_input == self.current_input_number \
                         and last_process_input > self.current_server_number:
-                    # updated_reward = update_player_msg.ai_reward
 
-                    # is_done = False
-                    # if self.objective == OBJECTIVE_NOT_COLLIDE:
-                        # is_done = update_player_msg.x == self.player.x and update_player_msg.y == self.player.y
-                    # # if is_done == True:
-                        # # updated_reward = 0 
-
-                    # self.current_server_number = last_process_input
-                    # self.player = update_player_msg
-                    # obs = self.__get_obs()
-
-                    # return obs, updated_reward, is_done
+                    # Calculate reward of the move. The reward is customizable. In my implementation, the reward is equal to 1 / distance of the player to the goal
                     dist = self.dist(update_player_msg.x, update_player_msg.y, GOAL['x'], GOAL['y'])
                     ai_reward = 1 / dist
                     updated_reward = ai_reward
 
                     is_done = False
 
-                    # if self.num_steps >= MAX_STEPS:
-                        # updated_reward = ai_reward
-                        # is_done = True
+                    # Some heuristic to stop the agent early. This will do early termination if the agent doesn't move after taking action (hit the wall).
                     if self.num_steps >= MAX_STEPS or abs(update_player_msg.x - self.player.x) + abs(update_player_msg.y - self.player.y) <= EPS:
                         updated_reward = ai_reward
                         is_done = True
+                    # If reach the goal (distance <= WIN_REWARD)
                     if dist <= WIN_REWARD:
                         updated_reward = 1
                         is_done = True
-                        print('reward : ', updated_reward)
 
+                    # update current_server_number to the current process input
                     self.current_server_number = last_process_input
                     self.player = update_player_msg
                     obs = self.__get_obs()
@@ -157,7 +171,6 @@ class CS2DEnvironment:
 
         shoot = messagepb.Shoot()
         shoot.dx, shoot.dy = self.normalize(dx, dy)
-        # shoot.dx, shoot.dy = dx, dy
         shoot.x = self.player.x
         shoot.y = self.player.y
         shoot.player_id = self.player.id
@@ -166,10 +179,13 @@ class CS2DEnvironment:
         self.ws.send(message.SerializeToString())
 
     def init(self):
+        """
+        Return player, map
+
+        Init agent
+        """
         self.player = None
-        print('create connection')
         self.ws = create_connection(self.wshost)
-        print('create connection done')
 
         # rem_steps define number of steps left
         self.rem_steps = MAX_STEPS
@@ -203,41 +219,20 @@ class CS2DEnvironment:
         return self.player, self.map
 
 
-
-        # self.client_id = res.client_id
-        # self.init_player(name, self.client_id)
-
-        # while True:
-            # binary_res = self.ws.recv()
-            # res = messagepb.ServerGameMessage()
-            # res.ParseFromString(binary_res)
-            # res = res.init_all_payload
-            # for player in res.init_player:
-                # if player.is_main:
-                    # self.player = player
-            # print("Myself is : ", self.player)
-
-
     def reset(self):
+        """
+        Reset the agent and return observation
+        """
         self.num_steps = 0
         self.ws.close()
         self.init()
         self.set_position(100, 100)
         return self.__get_obs()
-        # while True:
-            # # Set timeout
-            # binary_res = self.ws.recv()
-            # # Received client accepted from server with client_id
-            # serverMsg = messagepb.ServerGameMessage()
-            # serverMsg.ParseFromString(binary_res)
-
-            # if serverMsg.HasField("update_player_payload") == True:
-                # update_player_msg = serverMsg.update_player_payload
-
-                # if self.player.id == update_player_msg.id:
-                    # return self.__get_obs(update_player_msg)
 
     def __get_nearest_dist(self, x, y):
+        """
+        Return the nearest distance to a block. This heuristic to avoid the agent hit the wall.
+        """
         block_size = self.map_bwidth
 
         i = int(y / block_size)
@@ -270,6 +265,9 @@ class CS2DEnvironment:
         return (left, right, up, down)
 
     def __get_player_position(self, x, y):
+        """
+        Return the position of player in the matrix
+        """
         block_size = self.map_bwidth
 
         i = int(y / block_size)
@@ -280,8 +278,10 @@ class CS2DEnvironment:
 
         return arr
 
-
     def __get_obs(self):
+        """
+        Return observation as an 1D array from the message received from server
+        """
         # from player and map, we build observation
         # The first observation is player
         obs = []
@@ -302,10 +302,3 @@ class CS2DEnvironment:
 
     def get_obs_size(self):
         return self.__get_obs().shape
-
-    # def obs():
-        # observation, reward, done, info = env.step(action)
-        # return observation
-
-    # def reset():
-
