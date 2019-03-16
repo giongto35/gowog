@@ -33,7 +33,7 @@ There are mainly 5 entities in the game. Their states are private
 
 ![Architecture](../document/images/architecture.png)
 
-Different entities call each other through channel which is wrapped in a function. Golang prevents cycle package dependency, so if a child want to call parent function, parent needs to expose method to child package. For example,IGame interface in Hub package to allow Hub call Game method.
+Different entities call each other through channel which is wrapped in a function. Golang prevents cycle package dependency, so if a child want to call parent function, parent needs to expose method to child package. For example, IGame interface in Hub package to allow Hub call Game method.
 
 ### Client Server sample interaction
 
