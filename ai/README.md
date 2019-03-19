@@ -4,6 +4,8 @@
 
 This repo contains CS2D environment following openAI gym format and a training script. The training script uses NeuroEvolution to find the shortest path to the destination in the maze.
 
+https://www.youtube.com/watch?v=pWbb1m91mhU
+
 ## Installation
 
 run gowog environment as instruction from . i.e install Docker and `./run_local.sh`
