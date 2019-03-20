@@ -37,7 +37,7 @@ class CS2DEnvironment:
         if env == LOCAL_ENV:
             wshost = 'ws://localhost:8080/game/'
         else:
-            wshost = ''# Not allowed yet
+            wshost = 'ws://35.198.245.53/game/' # Not allowed yet
 
         self.name = name
         self.wshost = wshost
@@ -54,20 +54,6 @@ class CS2DEnvironment:
         dx, dy = d[0], d[1]
         obs, reward, done = self.move_position(dx, dy)
         return obs, reward, done, None
-
-    def init_player(self, name, client_id):
-        self.current_input_number += 1
-
-        # Construct init player message
-        message = messagepb.ClientGameMessage()
-
-        init_player = messagepb.InitPlayer()
-        init_player.name = name
-        init_player.client_id = client_id
-        message.input_sequence_number = self.current_input_number
-        message.init_player_payload.CopyFrom(init_player)
-
-        self.ws.send(message.SerializeToString())
 
     def set_position(self, x, y):
         # Construct set_position message
@@ -130,29 +116,12 @@ class CS2DEnvironment:
                 if self.player.id == update_player_msg.id \
                         and last_process_input == self.current_input_number \
                         and last_process_input > self.current_server_number:
-
-                    # Calculate reward of the move. The reward is customizable. In my implementation, the reward is equal to 1 / distance of the player to the goal
-                    dist = self.dist(update_player_msg.x, update_player_msg.y, GOAL['x'], GOAL['y'])
-                    ai_reward = 1 / dist
-                    updated_reward = ai_reward
-
-                    is_done = False
-
-                    # Some heuristic to stop the agent early. This will do early termination if the agent doesn't move after taking action (hit the wall).
-                    if self.num_steps >= MAX_STEPS or abs(update_player_msg.x - self.player.x) + abs(update_player_msg.y - self.player.y) <= EPS:
-                        updated_reward = ai_reward
-                        is_done = True
-                    # If reach the goal (distance <= WIN_REWARD)
-                    if dist <= WIN_REWARD:
-                        updated_reward = 1
-                        is_done = True
-
                     # update current_server_number to the current process input
                     self.current_server_number = last_process_input
                     self.player = update_player_msg
                     obs = self.__get_obs()
 
-                    return obs, updated_reward, is_done
+                    return obs, 0, False
 
     def dist(self, x1, y1, x2, y2):
         return math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
@@ -170,6 +139,23 @@ class CS2DEnvironment:
         shoot.y = self.player.y
         shoot.player_id = self.player.id
         message.shoot_payload.CopyFrom(shoot)
+
+        self.ws.send(message.SerializeToString())
+
+    def __init_player(self, name, client_id):
+        """
+        Private function to init player with name and client_id come from server
+        """
+        self.current_input_number += 1
+
+        # Construct init player message
+        message = messagepb.ClientGameMessage()
+
+        init_player = messagepb.InitPlayer()
+        init_player.name = name
+        init_player.client_id = client_id
+        message.input_sequence_number = self.current_input_number
+        message.init_player_payload.CopyFrom(init_player)
 
         self.ws.send(message.SerializeToString())
 
@@ -197,10 +183,12 @@ class CS2DEnvironment:
 
             if serverMsg.HasField("register_client_id_payload") == True:
                 self.client_id = serverMsg.register_client_id_payload.client_id
-                self.init_player(self.name, self.client_id)
+                self.__init_player(self.name, self.client_id)
+
             if serverMsg.HasField("init_player_payload") == True:
                 if serverMsg.init_player_payload.is_main:
                     self.player = serverMsg.init_player_payload
+
             if serverMsg.HasField("init_all_payload") == True:
                 self.map = serverMsg.init_all_payload.init_map.block
                 self.map_ncols = serverMsg.init_all_payload.init_map.num_cols
@@ -224,74 +212,21 @@ class CS2DEnvironment:
         self.set_position(100, 100)
         return self.__get_obs()
 
-    def __get_nearest_dist(self, x, y):
-        """
-        Return the nearest distance to a block. This heuristic to avoid the agent hit the wall.
-        """
-        block_size = self.map_bwidth
-
-        i = int(y / block_size)
-        j = int(x / block_size)
-        left = x
-        right = self.map_ncols * block_size - x
-        up = y
-        down = self.map_nrows * block_size - y
-
-        for jj in range(j, -1, -1):
-            if self.map[i * self.map_ncols + jj] == 1:
-                left = max(0, x - (jj + 1) * block_size)
-                break
-
-        for jj in range(j, self.map_ncols):
-            if self.map[i * self.map_ncols + jj] == 1:
-                right = max(0, jj * block_size - x)
-                break
-
-        for ii in range(i, -1, -1):
-            if self.map[ii * self.map_ncols + j] == 1:
-                up = max(0, y - (ii + 1) * block_size)
-                break
-
-        for ii in range(i, self.map_nrows):
-            if self.map[ii * self.map_ncols + j] == 1:
-                down = max(0, ii * block_size - y)
-                break
-
-        return (left, right, up, down)
-
-    def __get_player_position(self, x, y):
-        """
-        Return the position of player in the matrix
-        """
-        block_size = self.map_bwidth
-
-        i = int(y / block_size)
-        j = int(x / block_size)
-        p = i * self.map_ncols + j
-        arr = [0] * (self.map_ncols * self.map_nrows)
-        arr[p] = 1
-
-        return arr
-
     def __get_obs(self):
         """
-        Return observation as an 1D array from the message received from server
+        Return observation
+          obs["player"] : location of player (x, y) . e.g (1,2)
+          obs["map"] : map in binary . e.g [1, 0, 0, 1, 0]
         """
-        # from player and map, we build observation
-        # The first observation is player
-        obs = []
-        obs.extend([self.player.x, self.player.y])
-        # Add game constant
-        obs.extend([PLAYER_SIZE, self.map_ncols, self.map_nrows, self.map_bwidth, self.map_bheight])
-        # Add distance to nearest block
-        (left, right, up, down) = self.__get_nearest_dist(self.player.x, self.player.y)
-        obs.extend([left, right, up, down])
-        # Add player position
-        player_pos_mat = self.__get_player_position(self.player.x, self.player.y)
-        obs.extend(player_pos_mat)
-        # The last observation is map
-        obs.extend(self.map)
-        obs = [obs]
+        obs = {}
+        obs["player"] = self.player
+        obs["player_size"] = PLAYER_SIZE
+        obs["map"] = self.map
+        obs["num_cols"] = self.map_ncols
+        obs["num_rows"] = self.map_nrows
+        obs["block_width"] = self.map_bwidth
+        obs["block_height"] = self.map_bheight
+
         return np.array(obs)
         # The next observation is map
 

@@ -2,6 +2,8 @@ __pycache__/*
 *.pyc
 runs
 saves
+save
+test
 runs
 DockerfileProd
 prod
