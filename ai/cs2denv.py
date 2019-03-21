@@ -37,7 +37,7 @@ class CS2DEnvironment:
         if env == LOCAL_ENV:
             wshost = 'ws://localhost:8080/game/'
         else:
-            wshost = 'ws://35.198.245.53/game/' # Not allowed yet
+            wshost = 'ws://game.giongto35.com/game/' # Not allowed yet
 
         self.name = name
         self.wshost = wshost
