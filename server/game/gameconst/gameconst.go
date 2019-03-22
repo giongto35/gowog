@@ -4,7 +4,7 @@ const PlayerSpeed = 300
 const MapWidth = 200
 const MapHeight = 200
 const ReloadTime = 100
-const RefreshRate = 1000
+const RefreshRate = 1
 
 const PlayerSize = 32
 const PlayerWidth = 32
