@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net"
 	"net/http"
 	"time"
 
@@ -36,6 +37,9 @@ type clientImpl struct {
 
 	// ID
 	id int32
+
+	// RemoteAddress
+	remoteAdd net.Addr
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -121,17 +125,11 @@ func (c *clientImpl) GetID() int32 {
 }
 
 // NewClient returns new client given hub
-func NewClient(upgrader websocket.Upgrader, hub Hub, w http.ResponseWriter, r *http.Request) Client {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
+func NewClient(conn *websocket.Conn, hub Hub, w http.ResponseWriter, r *http.Request) Client {
+	// Check if the remote address is reused (there are more than one client)
+
 	// TODO: disconnect and reconnect cause deadlock
 	client := &clientImpl{id: rand.Int31(), hub: hub, conn: conn, send: make(chan []byte, gameconst.BufferSize)}
-	// We need to register client from hub.
-	<-client.hub.Register(client)
-	//client.id = <-clientIDChan
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
