@@ -1,10 +1,13 @@
 package ws
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/giongto35/gowog/server/game/gameconst"
+	"github.com/gorilla/websocket"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -12,6 +15,9 @@ import (
 type hubImpl struct {
 	// Registered clients.
 	clients map[int32]Client
+
+	// Keep track existing client, so we can avoid duplication
+	exist map[string]Client
 
 	// register fetching register event and process it
 	register chan registerClientEvent
@@ -40,8 +46,9 @@ type broadcastMessage struct {
 }
 
 type registerClientEvent struct {
-	client Client
-	done chan bool
+	//client Client
+	conn *websocket.Conn
+	done chan Client
 }
 
 func NewHub() Hub {
@@ -50,6 +57,7 @@ func NewHub() Hub {
 		broadcastMsgStream: make(chan broadcastMessage, gameconst.BufferSize),
 		register:           make(chan registerClientEvent, gameconst.BufferSize),
 		unregister:         make(chan Client, gameconst.BufferSize),
+		exist:              make(map[string]Client),
 		clients:            make(map[int32]Client),
 	}
 }
@@ -61,19 +69,24 @@ func (h *hubImpl) BindGameMaster(game IGame) {
 func (h *hubImpl) Run() {
 	log.Println("Hub is running")
 	for {
-		log.Println("HUB PROCESS")
 		select {
 		case register := <-h.register:
-			log.Println("HUB register", register.client.GetID())
-			client := register.client
-			h.clients[client.GetID()] = client
-			register.done <- true
-			log.Println("HUB register done")
+			if client, err := h.newClientFromConn(register.conn); err == nil {
+				h.clients[client.GetID()] = client
+				register.done <- client
+			}
 
 		case client := <-h.unregister:
 			// TODO: BUG HERE, deadlock
 			log.Println("Close client ", client.GetID())
 			h.game.RemovePlayerByClientID(client.GetID())
+			// Remove client from existed list, so the remoteAddr can be reused again
+			for k, v := range h.exist {
+				if v == client {
+					delete(h.exist, k)
+				}
+			}
+
 			log.Println("Close client done", client.GetID())
 			// send to game event stream
 			delete(h.clients, client.GetID())
@@ -111,11 +124,29 @@ func (h *hubImpl) Run() {
 	}
 }
 
-func (h *hubImpl) Register(c Client) chan bool {
-	done := make(chan bool)
+func (h *hubImpl) Register(c *websocket.Conn) chan Client {
+	done := make(chan Client)
 	// This clientIDchan is the channel for client to receive clientID after initilized
-	h.register <- registerClientEvent{client: c, done:done}
+	h.register <- registerClientEvent{conn: c, done: done}
 	return done
+}
+
+func (h *hubImpl) newClientFromConn(conn *websocket.Conn) (Client, error) {
+	var remoteAddr string
+	if parts := strings.Split(conn.RemoteAddr().String(), ":"); len(parts) == 2 {
+		remoteAddr = parts[0]
+	}
+
+	fmt.Println("Registering ", remoteAddr)
+	// If exist, we have duplication connection -> end
+	// TODO: invalidate exist when client disconnect
+	if _, ok := h.exist[remoteAddr]; ok {
+		return nil, errors.New("Duplicate client")
+	}
+	client := NewClient(conn, h)
+	h.exist[remoteAddr] = client
+
+	return client, nil
 }
 
 func (h *hubImpl) UnRegister(c Client) {

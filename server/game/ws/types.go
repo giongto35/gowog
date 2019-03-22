@@ -1,5 +1,7 @@
 package ws
 
+import "github.com/gorilla/websocket"
+
 // Client is equivalent to a user connection.
 type Client interface {
 	WritePump()
@@ -14,7 +16,7 @@ type Client interface {
 type Hub interface {
 	Run()
 	UnRegister(c Client)
-	Register(c Client) chan bool
+	Register(c *websocket.Conn) chan Client
 	ReceiveMessage(b []byte)
 	Broadcast(b []byte)
 	BroadcastExclude(b []byte, id int32)

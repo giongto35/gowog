@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"runtime"
-	"strings"
 
 	"github.com/giongto35/gowog/server/game"
 	"github.com/giongto35/gowog/server/game/ws"
@@ -27,7 +26,6 @@ var hub = ws.NewHub()
 var gameMaster = game.NewGame(hub)
 
 var ErrDuplicatedAddress = errors.New("Duplicated Address")
-var exist = map[string]ws.Client{}
 
 // serveWs handles websocket requests from the peer.
 func connect(w http.ResponseWriter, r *http.Request) {
@@ -38,24 +36,9 @@ func connect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get remote address
-	var remoteAddr string
-	if parts := strings.Split(r.RemoteAddr, ":"); len(parts) == 2 {
-		remoteAddr = parts[0]
-	}
+	// Wait for hub to finish register client
+	clientID := <-hub.Register(conn)
 
-	fmt.Println("Registering ", remoteAddr)
-	// If exist, we have duplication connection -> end
-	// TODO: invalidate exist when client disconnect
-	if _, ok := exist[remoteAddr]; ok {
-		// TODO: Send duplicate message error
-		return
-	}
-	clientID := ws.NewClient(conn, hub, w, r)
-	exist[remoteAddr] = clientID
-
-	// We need to register client from hub.
-	<-hub.Register(clientID)
 	gameMaster.NewPlayerConnect(clientID)
 }
 

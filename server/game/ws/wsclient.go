@@ -5,7 +5,6 @@ import (
 	"log"
 	"math/rand"
 	"net"
-	"net/http"
 	"time"
 
 	"github.com/giongto35/gowog/server/game/gameconst"
@@ -125,7 +124,7 @@ func (c *clientImpl) GetID() int32 {
 }
 
 // NewClient returns new client given hub
-func NewClient(conn *websocket.Conn, hub Hub, w http.ResponseWriter, r *http.Request) Client {
+func NewClient(conn *websocket.Conn, hub Hub) Client {
 	// Check if the remote address is reused (there are more than one client)
 
 	// TODO: disconnect and reconnect cause deadlock
