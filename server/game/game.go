@@ -287,15 +287,12 @@ func (g *gameImpl) initPlayer(clientID int32, name string) {
 		},
 	}
 	encodedMsg, _ := proto.Marshal(initPlayerMsg)
-	fmt.Println("0")
 	g.hub.Send(clientID, encodedMsg)
 
 	// Send all other players about new player info
 	initPlayerMsg.GetInitPlayerPayload().IsMain = false
 	encodedMsg, _ = proto.Marshal(initPlayerMsg)
-	fmt.Println("broadcast 0.5")
 	g.hub.BroadcastExclude(encodedMsg, clientID)
-	fmt.Println("Done broadcast 0.5")
 }
 
 //  removePlayer remove player logic from game using player ID
