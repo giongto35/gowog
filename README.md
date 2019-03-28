@@ -61,7 +61,7 @@ Install dependencies
 
   * `npm install`
 
-Run the client. The client will listen at port 3000. env.HOST_IP is the host of server
+Run the client. The client will listen at port 3000. env.HOST_IP is the IP of gowog server which is localhost:8080 now.
 
   * `npm run dev -- --env.HOST_IP=localhost:8080`
 
