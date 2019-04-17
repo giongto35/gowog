@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -140,9 +139,9 @@ func (h *hubImpl) newClientFromConn(conn *websocket.Conn) (Client, error) {
 	fmt.Println("Registering ", remoteAddr)
 	// If exist, we have duplication connection -> end
 	// TODO: invalidate exist when client disconnect
-	if _, ok := h.exist[remoteAddr]; remoteAddr != "" && ok {
-		return nil, errors.New("Duplicate client")
-	}
+	//if _, ok := h.exist[remoteAddr]; remoteAddr != "" && ok {
+	//return nil, errors.New("Duplicate client")
+	//}
 	client := NewClient(conn, h)
 	h.exist[remoteAddr] = client
 
