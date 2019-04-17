@@ -61,7 +61,7 @@ Install dependencies
 
   * `npm install`
 
-Run the client. The client will listen at port 3000. env.HOST_IP is the host of server
+Run the client. The client will listen at port 3000. env.HOST_IP is the IP of gowog server which is localhost:8080 now.
 
   * `npm run dev -- --env.HOST_IP=localhost:8080`
 
@@ -71,7 +71,7 @@ Open the browser "localhost:3000"
 
 In development we run client on port 3000 and server on port 8080 separately.
 
-In production and docker environment, there is only one server running on port 8080 which returns html on the same port, so if we run docker, the browser is "localhost:8080".
+In production and docker environment, the client is built and golang server will return client page on the same port 8080. Therefore, if we run docker environment, the game will start at "localhost:8080" in browser.
 
 #### Communication convention
 
