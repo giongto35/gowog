@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"runtime"
 
 	"github.com/giongto35/gowog/server/game"
 	"github.com/giongto35/gowog/server/game/ws"
@@ -43,8 +42,6 @@ func connect(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// Running on one core only
-	runtime.GOMAXPROCS(2)
 	flag.Parse()
 	if *disablelog {
 		log.SetOutput(ioutil.Discard)
