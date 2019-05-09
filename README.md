@@ -10,11 +10,7 @@ Southeast Asia region (Vietnam, Singapore, Malaysia ...)
 
 http://game.giongto35.com
 
-US West region (California)
-
-http://us.game.giongto35.com
-
-**Note**: Please select the region closest to you to have the best gaming experience.
+Due to the cost of hosting. The server is hosted only on SEA.
 
 ### AI Experiment on the Agent
 
